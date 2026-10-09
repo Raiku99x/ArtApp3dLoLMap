@@ -94,6 +94,8 @@ body.touch #fp .tc{display:block}
 #ui .va:hover{background:linear-gradient(180deg,#f0e6d2,#c8aa6e);color:#010a13}
 #ui .fp{background:linear-gradient(180deg,#1e2328,#0a1428);color:#cdbe91}
 #ui button.on{border-color:#f0e6d2;color:#f0e6d2;box-shadow:inset 0 0 0 1px #c8aa6e,0 0 10px #c8aa6e88;filter:none}
+#htag{position:absolute;z-index:3;transform:translate(-50%,-100%);pointer-events:none;font-family:'Cinzel','Beaufort for LOL',Georgia,serif;font-weight:700;font-size:12px;letter-spacing:.1em;color:#f0e6d2;text-shadow:0 1px 2px #000;padding:2px 10px;background:linear-gradient(180deg,#0a1e2dcc,#010a13dd);border:1px solid #785a28;border-radius:2px;white-space:nowrap;display:none}
+#htag #hpb{display:block;height:5px;margin-top:3px;background:#010a13;border:1px solid #463714}#htag #hpf{display:block;height:100%;width:100%;background:linear-gradient(#6fe39a,#1f9a4a);transition:width .12s}
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
 <div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="tourStart()">&#9654; Visual Analysis</button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
 <button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span></div></div>
@@ -109,7 +111,8 @@ body.touch #fp .tc{display:block}
 if(location.protocol==='file:')document.getElementById('ld').innerHTML='Models need a web server.<br>Use GitHub Pages or run: python -m http.server';
 const S=new THREE.Scene();S.background=new THREE.Color(0x0e1a24);S.fog=new THREE.Fog(0x0e1a24,150,320);
 const C=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,1,600);
-const R=new THREE.WebGLRenderer({antialias:true});R.setSize(innerWidth,innerHeight);R.setPixelRatio(Math.min(devicePixelRatio,2));R.outputEncoding=THREE.sRGBEncoding;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(R.domElement);
+try{localStorage.removeItem('gfxq')}catch(e){}
+const AAOFF=(()=>{try{return sessionStorage.getItem('gfxq')==='mobile'}catch(e){return false}})();const R=new THREE.WebGLRenderer({antialias:!AAOFF,powerPreference:'high-performance'});R.setSize(innerWidth,innerHeight);R.setPixelRatio(AAOFF?Math.min(devicePixelRatio,2):Math.min(Math.max(devicePixelRatio,1.5),2));R.outputEncoding=THREE.sRGBEncoding;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(R.domElement);
 const HL=new THREE.HemisphereLight(0xdfe9ff,0x2c3a2c,0.5);S.add(HL);
 const sun=new THREE.DirectionalLight(0xfff2de,1.15);sun.position.set(-55,72,38);sun.castShadow=true;
 {const sm=Math.min(4096,R.capabilities.maxTextureSize),sc=sun.shadow.camera;sun.shadow.mapSize.set(sm,sm);sc.left=-78;sc.right=78;sc.top=78;sc.bottom=-78;sc.near=10;sc.far=220;sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.06;sun.shadow.radius=2.5}
@@ -218,14 +221,17 @@ riverHalf(1);riverHalf(-1);
 // ---------- layout data ----------
 const bt=[[-40,20],[-40,0],[-40,-20],[-20,40],[0,40],[20,40],[-30.1,30.1],[-20.2,20.2],[-10.3,10.3]]; // 3 towers per lane per team
 // camps read off the arrow sketch: [model, x, z, facing dx, facing dz] (arrow head = where the camp looks); the red half is the point mirror of this one
-const CP=[['blue_buff',-25.2,7.5,-.98,-.19],['gromp',-28.1,13.3,-.71,-.71],['wolf',-16.2,-.9,-1,0],['red_buff',2.4,26.3,-.85,.53],['krug',-9.9,27.7,-.64,-.77],['bird',-1.8,17.1,.99,.13]];
+const CP=[['blue_buff',-23.5,-1.5,-.98,-.19],['gromp',-25.2,7.5,-.71,-.71],['wolf',-16.2,-.9,-1,0],['red_buff',2.4,26.3,-.85,.53],['krug',-9.9,27.7,-.64,-.77],['bird',-1.8,17.1,.99,.13]];
 const camps=CP.flatMap(([n,x,z])=>[[x,z],[-x,-z]]);
 function dist(p,a,b){const dx=b[0]-a[0],dz=b[1]-a[1];let t=((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(dx*dx+dz*dz);t=Math.max(0,Math.min(1,t));return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dz)}
 const TP=[];let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
 // ---------- walls traced from the minimap ----------
 const WG=["0000021111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111", "0000211111111111111111111111111111111111111111111111111111111111111111111111111111111111111121211222", "0002111111111111111111111111111111111111111111111111111111111111111111111111111111111111111202022000", "0021111111111111111111111111111111111111111111111111111111111111111111112222222222222222222200002000", "0211111111111111111111111111111111111111111111111111111111111111111111220000000000000000000200000000", "2111111111111111111111111221122112222222222222222222222222222222222222000000000000000000000000000000", "1111111111111111111112222002200220000000000000000000000000000000000000000000000000000000000000000000", "1111111111111111111220000002120200000000000000000000000000000000000000000000000000000000000000000000", "1111111111222111122000000002200200000000000000000000000000000000000000000000000000000000000000000000", "1111111122000222200000000000222200000000000000000000000000000000000000000000000000000000000000000000", "1111111200000000000000000000022000000000000000000000000000000000000000000000000000000000000000000000", "1111111200000000000000000000022000000000000000000000022200000000000000000000000000000000000000000022", "1111112000000000000000000000022000000000000000000000000200000000000000000000000000000000000000000021", "1111112000000000000000002222211222000022222222002222220222000220000000000000000000000000000000000021", "1111112000000000000000021111111122000021112220002211112112000220000000000000000000000000000000000021", "1111111200000000000000021111112200000022220000000022111112000220000000000000000000000000000000000021", "1111111120000000000000002111120000000000000000000000211112000220000000000000000000000000000000000021", "1111111120000000000000002111200000000000000000020000222220000220000000000000000000000000000000000021", "1111111200000000000000002112000000000000000000022000000000002120000000000000000000000000000000000021", "1111111200000000000000000212000220000002222000212000000000021112000000000000000000000000000000000021", "1111111200000000000000000022000022222221111202112000000000021112000000000000000000000000000000000021", "1111112000000000000000000022200000002211111122222000000000002112000000000000000000000000000000000021", "1111112000000000000000000000000000000021112200000000022220002112000000000000000000000000000000000021", "1111112000000000000000000000000222000002220000000000211112002122000000000000000000000000000000000021", "1111120000000000000000000000002111220000000000000000021112000200000000000000000000000000000000000021", "1111120000000022000000000000021111112000000022200000002111200000000000000000000000000000000000000021", "1111120000000211220000000022211112211200000212000000000211200002220000000000000000000000000000000021", "1111120200000211112000000021111220022120000212000000000021200021120000000000000000000000000000000021", "1111112222000211111200000021112000000220000212000000200022000021112000000000000000000000000000000021", "1111112022002111111120000002112000000212000211200002200022000021111200000000000000000000000000000021", "1111112022002111122220000002120000000212000211120221200022000211112200000000000000000000000000000021", "1111112022002111200022000000220000000212000211112112200000000211120200000000000000000000000000000211", "1111111220002112000002200000022000000212000221112220000000002111200000000000000000000000000000000211", "1111111120002120000002200000000000002112000002220000000000002222220000000000000000000000000000002111", "1111112220002120000000220000000000221111200000000000000020002000000000000000000000000000000000002111", "1111120000002200002200000000000002211111120000000000000020000000000000000200000000000000000000002111", "1111120000000000002200000000000000022211120000000200000022000000000000002122000000000000000000002111", "1111120000000002002200002200000000000022200000002120000021220000000000021111222000000000000000002111", "1111120000000222002120002120000000000000000000002120000021120000000000211111111200000000000000002111", "1111120000002112002120002112000000000000000000000222002211200000000002222222211200002222200000002111", "1111120000002112002120000211220000000000000220000002221122000000000000000000021200021111200000002111", "1111120000002120002112000022112200000000000212200000211200222222000000000000002200002111200000002111", "1111120000002120002112000000222220000000000022122000022000220022002200000200000200002111200000002111", "1111120000002200002111200000000000000000000000211200000000212022002200022200000000000211200000002111", "1111120000002000002222200022000000000000000000021120000000220022022000022000000000000211200000002111", "1111120000002200000000000022220000000200000000002112000000022220022000212000000000000211200000002111", "1111120000002120000000000000212000000220000000000220000000002120022000211200000000000211122200002111", "1111120000000222222000000000212000000212000000000000000000002120022000021120000000000211200000002111", "1111120000000002212000000000212000000211220000000000000000002200022000022112200000000211200000002111", "1111120000000000022000022000212000000211112000000000000000021120022000000222000000000211200000002111", "1111120000000000002000211222122000000211112000000000000000021112002000000000000000000211200000002111", "1111120000002220000000022222200000000211112000000000000000021112000000000022222000000022200000002111", "1111120000002112000000000000000000200211112000000000000000021112000000022222222200020000000000002111", "1111120000002111200000000022200000220021112000000000000000021111200000021200000000212200000000002111", "1111120000002111200020000221122000220002120000000000000000002111200000022000000000211120000000002111", "1111120000000211200020000002212000212021112000000000000000000211200000022000000000022222200000002111", "1111120002222111200220000000021200021211212000000000000000000021200000022000000000000002200000002111", "1111120000002111200212000000021200211112022000000000000000000002200000021200000000000000200000002111", "1111120000002111200212000000022000212212022000000000000000000000000000002220000222200000200000002111", "1111120000002111200021200000222000220021212000000000000000000000000000000000000211120000200000002111", "1111120000002111120002120000200000220002120000022000000000000000000002200000000021120000000000002111", "1111120000002111120002112000000000000002220000211200000000000000000002222200000021120000000000002111", "1111120000002111120002111222022200000000000002122220000000000000000000022122000002120000000000002111", "1111120000000222220002111111211120000000000021200022200000000000000000000211200000220002200000002111", "1111120000000000000002211111111200000000000212000002120000000000000000000021122000220002200000002111", "1111120000000000000000022211112000000000002112000002220000000222200000000002212000220002200000002111", "1111120000000000000000000021120000000000000220000000000000002111122000000000021200020021200000002111", "1111120000000000000000000002200000000000000022000000000000002111111220000000021200000021200000202111", "1111120000000000000000000000000000000000000002200000000000000211112220000000002200000021200022221111", "1111120000000000000000000000000000000222220000000000000000000021120000000000002200000211200022021111", "1111200000000000000000000000000000002111200000000002222222200021200000022000000000000021200022021111", "1112000000000000000000000000000002221112000020000221121111200021200000021200000000000002200020021111", "1112000000000000000000000000000000211112000020000212202111200002200000021200000000220000000022021111", "1112000000000000000000000000000000211120000220000220000211200002200000021120000000212000000002211111", "1112000000000000000000000000000000021120000212000200000021200002120000211112000000211200000002221111", "1112000000000000000000000000000000002120000212000000000021200002112222111122000000211122000000002111", "1112000000000000000000000000000000002200000211200000000022000000211111112200000000211111200000002111", "1112000000000000000000000000000000000000000211200000000220000000021111120000000000211111200000002111", "1112000000000000000000000000000000000000200211122000000000000000002221200000000000022112000000021111", "1112000000000000000000000000000000000022200022112000000000000220000002200002000000000220000000021111", "1112000000000000000000000000000000000021120000220000022222222112000000000221220000000000000000021111", "1112000000000000000000000000000000000002112000000000211122211111220000000211112000000000000000021111", "1112000000000000000000000000000000000002111200000000211200021122222222000021111200000000000000211111", "1112000000000000000000000000000000000002112000000000212000002200000002000021111200000000000000211111", "1112000000000000000000000000000000000002120000222000022000000000000000000002111200000000000002111111", "1112000000000000000000000000000000000002120002111200000000000000000000000000211200000000000002111111", "1112000000022222000000000000000000000002200021111120000000000000222200000000212000000000000002111111", "1112000000000220000000000000000000000002200021111112200000002000021122222000222000000000000000211111", "1112000000022200000000000000000000000002200211121111120002221200021111112000000000000000000000211111", "1112000000221222200000000000000000000002200022202222220022222220002222222000000000000000000000021111", "1112000000202000000000000000000000000000000000000000000000000000000000000000000000000000000000211111", "1112000000220000000000000000000000000000000000000000000000000000000002222200000000000000000000211111", "2212000000000000000000000000000000000000000000000000000000000000000002202200000000000020000002111111", "0020000000000000000000000000000000000000000000000000000000000000000002202200000000000212200021111111", "0000000000000000000000000000000000000000000000000000000000000000000002120200000000022111122211111111", "0000000000000000000000000000000000000000000000000000000000000000000002112200000022211111111111111111", "0000000000000000000000000000000000000000000000000000000000000000000000212000222211111111111111111111", "0000000000000000000000000000000222222222222222222222222222222222222222111222111111111111111111111111", "0000000000000000000000000000002111111111111111111111111111111111111111111111111111111111111111111111", "0000000000222222222222222222221111111111111111111111111111111111111111111111111111111111111111111111"],WN=100,WS=105/WN,WO=-52.5,WC=[0x7b8088,0x6c7279,0x8a9096,0x5f6b62,0x747a82];
 // ---------- extra jungle walls near the Baron / Dragon pits (marked on a screenshot; point-mirrored to the other pit) ----------
-const XW=[[[-34.2,-23.5],[-34.2,-32],[-31.5,-35.4],[-30,-36.4],[-23.5,-32.4]]].flatMap(pl=>[pl,pl.map(p=>[-p[0],-p[1]])]);
+// curved wall behind each blue/red buff: a shallow arc (BWA degrees of sweep, radius BWR) bulging away from the lane side, apex BWD units from the buff
+const BWA=70,BWR=6.5,BWD=4.2,BWARC=(()=>{const b=CP[0],cx=b[1]-(BWR-BWD),a=[];for(let i=0;i<=8;i++){const f=(-BWA/2+BWA*i/8)*Math.PI/180;a.push([cx+BWR*Math.cos(f),b[2]+BWR*Math.sin(f)])}return a})();
+const nearBW=(x,z)=>[BWARC,BWARC.map(p=>[-p[0],-p[1]])].some(a=>a.some((p,i)=>i&&dist([x,z],a[i-1],p)<2.6));
+const XW=[[[-34.2,-23.5],[-34.2,-32],[-31.5,-35.4],[-30,-36.4],[-23.5,-32.4]],BWARC].flatMap(pl=>[pl,pl.map(p=>[-p[0],-p[1]])]);
 function exw(x,z){if(inPth(x,z,3.7))return false;return XW.some(pl=>{for(let i=0;i<pl.length-1;i++)if(dist([x,z],pl[i],pl[i+1])<1.55)return true;return false})}
 (function(){for(let i=0;i<WN;i++){const row=WG[i].split('');for(let j=0;j<WN;j++){if(exw(WO+(j+.5)*WS,WO+(i+.5)*WS))row[j]='2'}WG[i]=row.join('')}})();
 const bq=[...bt,...bt.map(p=>[-p[0],-p[1]])];
@@ -281,14 +287,15 @@ const MIDP=(function(){const u=[.7071,-.7071],n=[.7071,.7071],bush=[],rock=[];
  return{bush,rock}})();
 function buildMidWalls(){const A=[],B=[];MIDP.rock.forEach((p,i)=>(i%2?A:B).push(p));inst('rock_a',A,.95,1.0,-.07,new THREE.Color(1.9,1.25,.8));inst('rock_b',B,.95,1.1,-.07,new THREE.Color(1.9,1.25,.8))}
 function buildBushes(){// bushes on the real brush spots; any wall rock underneath is removed
- const BS=new Set(),L=[];
+ const BS=new Set();let L=[];
  WCELLS.forEach(c=>{if(inBush(c[0],c[1]))BS.add(c)});
  BP.forEach(p=>{const R=p[2]*1.2;for(let x=p[0]-R;x<=p[0]+R;x+=WS)for(let z=p[1]-R;z<=p[1]+R;z+=WS){if(inBush(x,z))L.push([x,z])}});
  // also turn some wall stretches into bush patches
- const cen=[];WCELLS.forEach(c=>{if(!c[2]||BS.has(c)||rnd()>.1)return;if(cen.some(p=>Math.hypot(p[0]-c[0],p[1]-c[1])<9))return;cen.push(c)});
- WCELLS.forEach(c=>{if(BS.has(c)||!c[2])return;for(const p of cen){if(Math.hypot(p[0]-c[0],p[1]-c[1])<3.2+rnd()*2.6){BS.add(c);L.push([c[0],c[1]]);break}}});
+ const cen=[];WCELLS.forEach(c=>{if(!c[2]||BS.has(c)||nearBW(c[0],c[1])||rnd()>.1)return;if(cen.some(p=>Math.hypot(p[0]-c[0],p[1]-c[1])<9))return;cen.push(c)});
+ WCELLS.forEach(c=>{if(BS.has(c)||!c[2]||nearBW(c[0],c[1]))return;for(const p of cen){if(Math.hypot(p[0]-c[0],p[1]-c[1])<3.2+rnd()*2.6){BS.add(c);L.push([c[0],c[1]]);break}}});
  MIDP.bush.forEach(p=>L.push(p));
  if(!L.length)return BS;
+ BLF=L.slice();L=L.filter((c,i)=>Math.max(Math.abs(c[0]),Math.abs(c[1]))<=42||(Math.imul(i+1,2246822519)>>>0)%100>=45);BLV=L;// side walls (outer band, beyond 42): ~45% fewer bushes; mid and jungle farms keep all of theirs; the hero can still walk through the removed spots
  const cv=document.createElement('canvas');cv.width=cv.height=64;const cx2=cv.getContext('2d'),gr=cx2.createRadialGradient(32,32,2,32,32,32);gr.addColorStop(0,'rgba(255,255,255,.75)');gr.addColorStop(.6,'rgba(255,255,255,.4)');gr.addColorStop(1,'rgba(255,255,255,0)');cx2.fillStyle=gr;cx2.fillRect(0,0,64,64);
  const gm=new THREE.MeshLambertMaterial({color:0x5c5a2c,map:new THREE.CanvasTexture(cv),transparent:true,depthWrite:false}),gi=new THREE.InstancedMesh(new THREE.CircleGeometry(1,10),gm,L.length),
   bg=makeClump(),bm=new THREE.MeshLambertMaterial({color:0xffffff,vertexColors:true,side:THREE.DoubleSide}),bi=new THREE.InstancedMesh(bg,bm,L.length*3),o=new THREE.Object3D(),col=new THREE.Color();
@@ -297,15 +304,15 @@ function buildBushes(){// bushes on the real brush spots; any wall rock undernea
   for(let n=0;n<2;n++){const s=.6+rnd()*.35,x=c[0]+(rnd()-.5)*.9,z=c[1]+(rnd()-.5)*.9,h=.5+rnd()*.35;
    o.position.set(x,.05+(c[3]||0),z);o.rotation.set(0,rnd()*6.28,0);o.scale.set(s,h,s);o.updateMatrix();bi.setMatrixAt(k,o.matrix);
    col.setRGB(.38+rnd()*.12,.45+rnd()*.1,.34+rnd()*.12);bi.setColorAt(k,col);BU.push({x,z,h,s,y:.05+(c[3]||0),r:rnd()*6.28});k++}});
- bi.count=k;S.add(gi,bi);BI=bi;return BS}
-let BI=null;const BU=[],BO=new THREE.Object3D();
+ bi.count=k;gi.userData.nt=bi.userData.nt=1;S.add(gi,bi);BI=bi;return BS}
+let BI=null,BLF=[],BLV=[];const BU=[],BO=new THREE.Object3D();
 function buildRocks(){const A=[],Bk=[],Sp=[],IA=[],IB=[];const BS=buildBushes();const WC=WCELLS.filter(c=>!BS.has(c));
  WC.forEach(c=>{const r=rnd();if(c[2]){if(r<.06)Sp.push(c);else if(r<.5)A.push(c);else Bk.push(c)}else{if(r<.5)IA.push(c);else IB.push(c)}});
  inst('rock_a',A,.85,.8);inst('rock_b',Bk,.85,.85);inst('spire',Sp,.45,.7);inst('rock_a',IA,.85,.8);inst('rock_b',IB,.85,.85);
  const P1=[],P2=[],nsp=c=>Math.hypot(c[0]+53.5,c[1]-53.5)<11||Math.hypot(c[0]-53.5,c[1]+53.5)<11;WC.forEach(c=>{if(!c[2]||rnd()>.3)return;const t1=rnd()<.5?P1:P2;if(!nsp(c))t1.push(c);if(rnd()<.4){const t2=rnd()<.5?P1:P2,e=[c[0]+(rnd()-.5)*1.8,c[1]+(rnd()-.5)*1.8,true];if(!nsp(e))t2.push(e)}});
  inst('pine_a',P1,1,.8,-.05);inst('pine_b',P2,1,.8,-.05);
  if(MD.cliff){const L=8.5,n=Math.ceil(108/L),im=new THREE.InstancedMesh(MD.cliff.g,LM('cliff'),n*4),o=new THREE.Object3D();let k=0;
-  for(let e=0;e<4;e++)for(let i=0;i<n;i++){const t=-54+(i+.5)*108/n,a=[[t,-52.5],[t,52.5],[-52.5,t],[52.5,t]][e];if(Math.hypot(a[0]+53.5,a[1]-53.5)<9.5||Math.hypot(a[0]-53.5,a[1]+53.5)<9.5)continue;o.position.set(a[0],.2,a[1]);o.rotation.set(0,e<2?0:Math.PI/2,0);o.scale.set(108/n/L*1.08,1.7,1.9);o.updateMatrix();im.setMatrixAt(k++,o.matrix)}
+  for(let e=0;e<4;e++)for(let i=0;i<n;i++){const t=-54+(i+.5)*108/n,a=[[t,-52.5],[t,52.5],[-52.5,t],[52.5,t]][e];if(Math.hypot(a[0]+53.5,a[1]-53.5)<9.5||Math.hypot(a[0]-53.5,a[1]+53.5)<9.5||(Math.abs(a[0])>46&&Math.abs(a[1])>46))continue;o.position.set(a[0],.2,a[1]);o.rotation.set(0,e<2?0:Math.PI/2,0);o.scale.set(108/n/L*1.08,1.7,1.9);o.updateMatrix();im.setMatrixAt(k++,o.matrix)}
   im.count=k;S.add(im)}else{[[108,1.8,0,-52.5],[108,1.8,0,52.5],[1.8,108,-52.5,0],[52.5,108,0,0]].slice(0,2).forEach(a=>add(new THREE.BoxGeometry(a[0],3,1.8),0x6c7279,a[2],1.5,a[3]));
    add(new THREE.BoxGeometry(1.8,3,108),0x6c7279,-52.5,1.5,0);add(new THREE.BoxGeometry(1.8,3,108),0x6c7279,52.5,1.5,0)}}
 const PITR={};
@@ -324,7 +331,7 @@ for(let i=0;i<300&&TP.length<130;i++){const p=[(rnd()-.5)*96,(rnd()-.5)*96];
  if(wallNear(p[0],p[1]))continue;
  TP.push(p)}
 // ---------- model loading ----------
-const GL=new THREE.GLTFLoader(),MD={},HT={tower:4.5,tree:3,nexus:11,baron:6.8,dragon:6.2,blue_buff:3.5,red_buff:3.5,gromp:2.5,krug:2.5,wolf:2.5,bird:2.5,ground:1,rock_a:2.4,rock_b:2.8,spire:4.5,cliff:8.5,crab:1.1,corner_rock:4,rubble:2.6,cliff2:4.6,pine_a:4.2,pine_b:3.2,pit_wall_baron:17.5,spawn_blue:17.7,spawn_red:17.7,pit_wall_dragon:17.5};
+const GL=new THREE.GLTFLoader(),MD={},HT={tower:4.2,tree:3,nexus:11,baron:6.8,dragon:6.2,blue_buff:3.5,red_buff:3.5,gromp:2.5,krug:2.5,wolf:2.5,bird:2.5,ground:1,rock_a:2.4,rock_b:2.8,spire:4.5,cliff:8.5,crab:1.1,corner_rock:4,rubble:2.6,cliff2:4.6,pine_a:4.2,pine_b:3.2,pit_wall_baron:17.5,spawn_blue:17.7,spawn_red:17.7,pit_wall_dragon:17.5};
 function loadModel(n){return new Promise(r=>GL.load('assets/'+n+'.glb',gl=>{let m;gl.scene.traverse(o=>{if(o.isMesh&&!m)m=o});gl.scene.updateMatrixWorld(true);
  const g=m.geometry.clone();g.applyMatrix4(m.matrixWorld);g.computeBoundingBox();let b=g.boundingBox;if(n==='cliff'&&(b.max.z-b.min.z)>(b.max.x-b.min.x)){g.rotateY(Math.PI/2);g.computeBoundingBox();b=g.boundingBox}
  g.translate(-(b.min.x+b.max.x)/2,-b.min.y,-(b.min.z+b.max.z)/2);const k=HT[n]/Math.max(b.max.x-b.min.x,b.max.y-b.min.y,b.max.z-b.min.z);if(n==='ground'){g.scale(110/(b.max.x-b.min.x),1.5/(b.max.y-b.min.y),110/(b.max.z-b.min.z));g.translate(0,-1.6,0)}else g.scale(k,k,k);
@@ -424,10 +431,10 @@ function climateTick(dt){const c=CLM[cur];skyK+=(skyTo-skyK)*Math.min(1,dt*1.5);
  SM.forEach(s=>{const u=s.userData;s.position.x+=u.v*dt*1.6;if(s.position.x>70)s.position.x=-70;s.position.y=u.y+Math.sin(tm*.4+u.ph)*.8;s.material.opacity=smogK*u.b*.2*(1+fl*.6)});
  WISP.material.opacity=wispK*.8;if(wispK>.02){const P=wpA;for(let i=0;i<WN2;i++){const w=wsd[i];P[i*3]+=Math.cos(tm*.3+w[0])*dt*.6;P[i*3+1]+=w[1]*dt;P[i*3+2]+=Math.sin(tm*.35+w[0])*dt*.6;if(P[i*3+1]>10)P[i*3+1]=.2}wpG.attributes.position.needsUpdate=true}}
 
-function tick(){viewMark();const dt=Math.min(clk.getDelta(),.05);tm+=dt;RT.value=tm;crabTick(tm);pitFxTick(tm,dt);flameTick(tm,dt);climateTick(dt);edgeTick(dt);
+function tick(){viewMark();const dt=Math.min(clk.getDelta(),.05);tm+=dt;const LO=GQ==='mobile';RT.value=LO?0:tm;if(!LO){crabTick(tm);pitFxTick(tm,dt);flameTick(tm,dt)}climateTick(dt);if(LO)return;edgeTick(dt);
  SPW.forEach(p=>{p.disc.material.opacity=.5+.2*Math.sin(tm*2+p.i*1.7);p.ring.rotation.z=tm*.6;p.beam.material.opacity=.06+.04*Math.sin(tm*1.5+p.i);p.beam.rotation.y=tm*.3});
  if(BI){const o=BO;for(let i=0;i<BU.length;i++){const b=BU[i],sw=Math.sin(tm*1.6+b.x*.35+b.z*.27)*.06;o.position.set(b.x,b.y,b.z);o.rotation.set(sw,b.r,sw*.7);o.scale.set(b.s,b.h*(1+.04*Math.sin(tm*2+b.r)),b.s);o.updateMatrix();BI.setMatrixAt(i,o.matrix)}BI.instanceMatrix.needsUpdate=true}
- NXL.forEach((n,i)=>{const p=.5+.5*Math.sin(tm*2+i*1.7);n.m.material.emissive.setHex(n.c).multiplyScalar(.008+.02*p);n.gl.scale.setScalar(n.F.r*(.9+.12*p));n.gl.material.opacity=.1+.1*p;
+ NXL.forEach((n,i)=>{const p=.5+.5*Math.sin(tm*2+i*1.7);n.m.material.emissive.setHex(n.c).multiplyScalar(.008+.02*p);n.gl.scale.setScalar(n.F.r*(.9+.12*p));n.gl.material.opacity=.16+.14*p;
   {const u=(tm*.18+i*.5)%1;n.pu.scale.setScalar(3+u*10);n.pu.material.opacity=.12*(1-u)*(1-u)*Math.min(1,u*5)}
   n.r1.rotation.set(1.1+Math.sin(tm*.7)*.3,tm*1.2,0);n.r2.rotation.set(.5,-tm*.9,Math.cos(tm*.6)*.4);
   for(let k=0;k<n.ph.length;k++){const u=(tm*.25+n.ph[k])%1,a=n.ag[k]+tm*.9,q=n.rd[k]*(1-.5*u);n.pa[k*3]=Math.cos(a)*q;n.pa[k*3+1]=u*n.F.Hn*1.15;n.pa[k*3+2]=Math.sin(a)*q}
@@ -473,9 +480,18 @@ function brightC(n,minY,th){const d=MD[n];if(!d||!d.map)return null;const g=d.g,
 function nexusFx(){const g=MD.nexus.g;g.computeBoundingBox();const Hn=g.boundingBox.max.y;let b=brightC('nexus',Hn*.5,150);if(!b)b={c:new THREE.Vector3(0,Hn*.7,0),r:1.2};
  if(Math.hypot(b.c.x,b.c.z)>2.5){b.c.x=0;b.c.z=0}return{Hn,c:b.c,r:Math.max(1,Math.min(2.4,b.r))}}
 const DOT=(()=>{const c=document.createElement('canvas');c.width=c.height=32;const x=c.getContext('2d'),g=x.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.45,'rgba(255,255,255,.45)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,32,32);return new THREE.CanvasTexture(c)})();
-function mkNexus(x,z,c,F){const col=new THREE.Color(c),m=new THREE.Mesh(MD.nexus.g,new THREE.MeshLambertMaterial({map:MD.nexus.map,color:new THREE.Color(0xffffff).lerp(col,.1),emissive:col.clone().multiplyScalar(.012)}));
+// nexus gem: tint the bright crystal vertices in the team colour (vertex colours on a per-team clone of the geometry)
+let NGM=null;
+function nexusGeo(c,F){const d=MD.nexus,g=d.g.clone(),P=g.attributes.position,U=g.attributes.uv,n=P.count;
+ if(!NGM){NGM=new Set();try{const im=d.map.image,w=im.width,h=im.height,cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.drawImage(im,0,0);const px=cx.getImageData(0,0,w,h).data;
+  for(let i=0;i<n;i++){if(Math.hypot(P.getX(i)-F.c.x,P.getY(i)-F.c.y,P.getZ(i)-F.c.z)>F.r*1.9)continue;const u=((U.getX(i)%1)+1)%1,v=((U.getY(i)%1)+1)%1,o=(Math.min(h-1,v*h|0)*w+Math.min(w-1,u*w|0))*4;if((px[o]+px[o+1]+px[o+2])/3>120)NGM.add(i)}}catch(e){}
+  if(NGM.size<12){NGM=new Set();for(let i=0;i<n;i++)if(Math.hypot(P.getX(i)-F.c.x,P.getY(i)-F.c.y,P.getZ(i)-F.c.z)<F.r*1.5)NGM.add(i)}}
+ const tc=new THREE.Color(c),hs={},K0=0;tc.getHSL(hs);tc.setHSL(hs.h,1,.5);const K=new Float32Array(n*3);
+ for(let i=0;i<n;i++){const q=NGM.has(i);K[i*3]=q?tc.r:1;K[i*3+1]=q?tc.g:1;K[i*3+2]=q?tc.b:1}
+ g.setAttribute('color',new THREE.BufferAttribute(K,3));return g}
+function mkNexus(x,z,c,F){const col=new THREE.Color(c),m=new THREE.Mesh(nexusGeo(c,F),new THREE.MeshLambertMaterial({map:MD.nexus.map,vertexColors:true,color:new THREE.Color(0xffffff).lerp(col,.1),emissive:col.clone().multiplyScalar(.012)}));
  m.position.set(x,.1,z);m.rotation.y=Math.atan2(-x,-z);S.add(m);
- const gl=new THREE.Mesh(sphG,AM());gl.material.color.copy(col);gl.position.copy(F.c);m.add(gl);
+ const gl=new THREE.Mesh(sphG,AM());gl.material.color.copy(col).offsetHSL(0,1,0);gl.material.color.setHSL(col.getHSL({}).h,1,.5);gl.position.copy(F.c);m.add(gl);
  const rg=r=>{const t=new THREE.Mesh(new THREE.TorusGeometry(r,.1,8,40),AM());t.material.color.copy(col);t.material.opacity=.3;t.position.copy(F.c);m.add(t);return t};
  const r1=rg(F.r*2.2),r2=rg(F.r*3),N=40,pa=new Float32Array(N*3),ph=[],ag=[],rd=[];for(let i=0;i<N;i++){ph.push(Math.random());ag.push(Math.random()*6.28);rd.push(2.5+Math.random()*3.5)}
  const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pa,3));
@@ -486,7 +502,7 @@ function widenGap(g,half){// cut a wider opening: drop triangles whose centre li
  const P=g.attributes.position,I=g.index.array,o=[];for(let i=0;i<I.length;i+=3){const a=I[i],b=I[i+1],c=I[i+2],x=(P.getX(a)+P.getX(b)+P.getX(c))/3,z=(P.getZ(a)+P.getZ(b)+P.getZ(c))/3,d=Math.abs(((Math.atan2(z,x)*180/Math.PI-90)+540)%360-180);if(d>half)o.push(a,b,c)}
  g.setIndex(o)}
 function buildPits(){Object.keys(PITR).forEach(k=>{if(!MD[k])return;const [bm,rm,cx,cz]=PITR[k];S.remove(bm,rm);const bar=k==='pit_wall_baron',g=MD[k].g;if(bar)widenGap(g,42);g.scale(bar?.8:.68,.5,bar?.8:.68);
- const m=new THREE.Mesh(MD[k].g,LM(k));m.position.set(cx,0,cz);m.rotation.y=cx<0?-Math.PI/4:3*Math.PI/4;S.add(m)})}
+ const m=new THREE.Mesh(MD[k].g,LM(k));m.position.set(cx,0,cz);m.rotation.y=cx<0?-Math.PI/4:3*Math.PI/4;S.add(m);(window.SOL=window.SOL||[]).push(m)})}
 function buildBaseWalls(){// rock walls in front of each nexus, with spire pillars at the lane gates
  const A=[],B=[],SP=[];[[-40,40,-Math.PI/4],[40,-40,3*Math.PI/4]].forEach(([bx,bz,d])=>{[15.4,16.8].forEach((r,ri)=>{let prev=true;
   for(let a=d-1.9,k=0;a<=d+1.9;a+=1.25/r,k++){const x=bx+r*Math.cos(a)+(rnd()-.5)*.4,z=bz+r*Math.sin(a)+(rnd()-.5)*.4;
@@ -538,7 +554,7 @@ function buildWallUpgrade(){let sd=99;const r=()=>(sd=(sd*16807)%2147483647)/214
  const used3=[];E.forEach(e=>{if(r()<.5&&far(used3,e[0],e[1],18)&&far(used2,e[0],e[1],4)){used3.push(e);ru.push([e[0]+e[2]*1.7,e[1]+e[3]*1.7,r()*6.28,.7+r()*.5,.8+r()*.5])}});
  // second, staggered cliff row just inside the map border + big corner rocks on the two non-base corners
  [[0,-1],[0,1],[-1,0],[1,0]].forEach(([ax,az],e)=>{for(let t=-52+r()*2;t<52;t+=9){const x=e<2?t:ax*50.4,z=e<2?az*50.4:t;
-  if(Math.hypot(x+53.5,z-53.5)<11||Math.hypot(x-53.5,z+53.5)<11)continue;cl.push([x,z,(e<2?0:Math.PI/2)+(r()<.5?Math.PI:0),.95+r()*.2,1+r()*.5,1.1])}});
+  if(Math.hypot(x+53.5,z-53.5)<11||Math.hypot(x-53.5,z+53.5)<11||(Math.abs(x)>44&&Math.abs(z)>44))continue;cl.push([x,z,(e<2?0:Math.PI/2)+(r()<.5?Math.PI:0),.95+r()*.2,1+r()*.5,1.1])}});
  [[-50,-50,Math.PI/4],[50,50,Math.PI/4+Math.PI]].forEach(p=>cr.push([p[0],p[1],p[2],2.2,2.4]));
  instM('cliff2',cl);instM('corner_rock',cr);instM('rubble',ru,-.12)}
 
@@ -653,9 +669,9 @@ const labs=(function(){
  add('River Crab','LIVING DETAILS \u00b7 CRAB',16.5,12.5,3,2,'','The second crab patrols the Dragon arm of the river. It walks across the water rather than along it, so it is always crossing the flow.',{ty:.7,r:8,el:26,da:70,fov:42,dyn:1,pt:[16.5,1,12.5]});
  [[-5.4,-5.4],[5.4,5.4]].forEach(p=>add('Mid Brush','NATURE \u00b7 BRUSH',p[0],p[1],3.4,3,'','A strip of tall brush closes off the end of each river arm, flanked by brown rock walls. It is a hiding place and a choke point right next to the mid lane.',{ty:.8,r:16,el:28,pt:[p[0],1.4,p[1]]}));
  // jungle camps
- {const CN={blue_buff:['Blue Buff','BUFF CAMP',2,'The Blue Buff stands out from the rocks with glowing blue orbs that match the cool, moonlit palette, so the camp is easy to find at a glance.'],
+ {const CN={blue_buff:['Blue Buff','BUFF CAMP',2,'The Blue Buff stands out from the rocks with glowing blue orbs that match the cool, moonlit palette, so the camp is easy to find at a glance. It sits in the open jungle between the Baron river and the mid lane.'],
    red_buff:['Red Buff','BUFF CAMP',2,'The Red Buff is the warm counterpart: red accents and claws against the cold greens and blues of the jungle make it pop, just like the Red Nexus does.'],
-   gromp:['Gromp','JUNGLE CAMP',3,'Gromp is a bulky, mossy creature that blends into the jungle yet keeps a chunky, readable silhouette. It sits right beside the Blue Buff, so the two form one cluster.'],
+   gromp:['Gromp','JUNGLE CAMP',3,'Gromp is a bulky, mossy creature that blends into the jungle yet keeps a chunky, readable silhouette. It stands just below the Blue Buff, so the two still form one cluster.'],
    wolf:['Wolves','JUNGLE CAMP',3,'A pack of wolves guards the camp closest to the lane. Their low, spread-out shapes contrast with the tall buff monsters, so the camp reads clearly even from high above.'],
    krug:['Krugs','JUNGLE CAMP',3,'The Krugs are stone creatures whose rocky bodies echo the jungle walls around them: character design that doubles as environment. They sit next to the Red Buff.'],
    bird:['Raptors','JUNGLE CAMP',3,'The bird camp sits in the open jungle between the lanes. Light, spiky silhouettes against the dark ground make it easy to spot.']};
@@ -703,7 +719,7 @@ const TD=[
  tx:'Same shape, opposite colour. The warm red glow against a cold blue-teal world makes the enemy base pop out. Colour contrast separates ally from opponent at a glance, without a single word of text.'},
 {k:'LANDMARKS',st:1,h:'The base statue',t:[-56,5,56],r:32,el:-4,a:135,de:6,da:45,z:-.08,fov:56,pt:[-56,4.4,56],
  tx:'Behind each spawn platform a tall guardian statue watches over the base. Its chest crystal glows in the team colour, so even the quiet corner of the map says whose home this is. The Red base has the mirrored twin with a red glow.'},
-{k:'SHAPE, COLOR & PATH LANGUAGE',h:'Towers and lanes',t:[-40,2.4,-15],r:15,el:16,a:60,de:4,da:70,z:-.15,fov:44,pt:[-40,3.8,-15],
+{k:'SHAPE, COLOR & PATH LANGUAGE',h:'Towers and lanes',t:[-40,2.4,0],r:15,el:16,a:60,de:4,da:70,z:-.15,fov:44,pt:[-40,3.8,0],
  tx:'Every tower repeats one silhouette, tinted in the owner\u2019s colour with a glowing crystal on top. A worn path texture marks each lane against the darker grass, so the routes read clearly even from far away.'},
 {k:'ENVIRONMENTAL STORYTELLING',h:'Baron Pit',t:[-23,3,-23],r:24,el:24,a:20,de:3,da:90,z:-.1,fov:44,pt:[-23,5,-23],
  tx:'Baron\u2019s pit is ringed by tall stone in cold purples, with the creature crouched at the centre. The shape says \u201cdanger\u201d, and the purple palette gives this late-game objective an identity of its own.'},
@@ -713,8 +729,8 @@ const TD=[
  tx:'Two curved arms of dark water flow out of the Baron and Dragon pits and drift toward the mid lane. The water ripples and pulls the eye across the map, and green brush strips with stone walls where the river ends act as choke points and hiding spots.'},
 {k:'LIVING DETAILS',h:'The river crab',t:[-16.5,.7,-12.5],r:8,el:26,a:-35,de:3,da:70,z:-.1,fov:42,pt:[-16.5,1,-12.5],dyn:0,
  tx:'A small crab scuttles sideways along each arm of the river, one on the Blue side and one on the Red side. It is much smaller than the camp monsters, so it reads as a neutral critter, and its constant movement makes the water feel alive.'},
-{k:'CHARACTER DESIGN',h:'Blue Buff camp',t:[-25.2,1.6,7.5],r:12,el:18,a:-100,de:4,da:60,z:-.1,fov:42,pt:[-25.2,2.6,7.5],
- tx:'The Blue Buff stands out from the rocks with glowing blue orbs that match the cool, moonlit palette. Next to it Gromp and the wolves keep their own silhouettes, so each camp is recognisable at a glance and character design doubles as gameplay information.'},
+{k:'CHARACTER DESIGN',h:'Blue Buff camp',t:[-23.5,1.6,-1.5],r:12,el:18,a:-100,de:4,da:60,z:-.1,fov:42,pt:[-23.5,2.6,-1.5],
+ tx:'The Blue Buff sits in the open jungle between the Baron river and the mid lane, where its glowing blue orbs match the cool, moonlit palette and stand out from the rocks. Gromp stands just below it and the wolves a little further on, so each camp keeps its own silhouette and the layout doubles as gameplay information.'},
 {k:'CHARACTER DESIGN',h:'Red Buff camp',t:[2.4,1.6,26.3],r:12,el:18,a:-58,de:4,da:60,z:-.1,fov:42,pt:[2.4,2.6,26.3],
  tx:'The Red Buff is the warm counterpart: red accents and claws against the cold greens and blues of the jungle make it pop, just like the Red Nexus does. Krug and the other camps sit nearby, and the whole jungle is point-mirrored so the Red side has the same camps.'},
 {k:'TEXTURE & MATERIAL',wl:1,h:'Jungle walls and foliage',t:[-30,1.2,-8],r:17,el:24,a:40,de:3,da:80,z:-.1,fov:44,pt:[-30,1.8,-8],
@@ -807,7 +823,7 @@ function fppStart(){if(FPP||TOUR||$('ld'))return;
  C.position.set(-34,7,34);C.near=.1;C.fov=75;C.updateProjectionMatrix();C.rotation.order='YXZ';
  document.body.classList.add('fpp');$('fph').innerHTML=FPH0;$('fph').style.opacity=1;fppHint=performance.now()+7000;fppLast=performance.now();
  if(!isTouch&&el.requestPointerLock)try{el.requestPointerLock()}catch(e){}}
-function fppExit(){if(!FPP)return;if(HERO.m)HERO.m.visible=false;FPP=null;for(const k in FK)FK[k]=false;FJ.on=false;FL.id=-1;$('fj').style.display='none';
+function fppExit(){if(!FPP)return;if(HERO.m)HERO.m.visible=false;if(typeof tppClear==='function')tppClear();{const tg=document.getElementById('htag');if(tg)tg.style.display='none'}FPP=null;for(const k in FK)FK[k]=false;FJ.on=false;FL.id=-1;$('fj').style.display='none';
  if(document.pointerLockElement)document.exitPointerLock();
  document.body.classList.remove('fpp');C.near=1;C.fov=50;C.updateProjectionMatrix();C.rotation.order='XYZ';th=.6;ph=.9;rad=150}
 document.addEventListener('pointerlockchange',()=>{if(FPP&&!isTouch&&!document.pointerLockElement)fppExit()});
@@ -837,61 +853,111 @@ function fppTick(){const F=FPP,now=performance.now(),dt=Math.min(.05,(now-fppLas
  if(now>fppHint)$('fph').style.opacity=0;}
 const FPH0=$('fph').innerHTML;
 // ---------- TPP: MOBA-view floating hero (right-click / WASD to move) ----------
-const TPPC=[];(function(){bt.forEach(p=>{TPPC.push([p[0],p[1],1.5],[-p[0],-p[1],1.5])});TPPC.push([-40,40,4.5],[40,-40,4.5],[-56,56,3],[56,-56,3],[-23,-23,3.2],[23,23,3.2])})();
-const HERO={m:null,h:1.9,yawOff:0,loading:false,fl:.65,yaw:-Math.PI/4,pitch:.78};
+const TPPC=[];(function(){bt.forEach(p=>{TPPC.push([p[0],p[1],1.4],[-p[0],-p[1],1.4])});TPPC.push([-40,40,4.5],[40,-40,4.5],[-56,56,3],[56,-56,3],[-23,-23,3.2],[23,23,3.2])})();
+const HERO={hit:0,m:null,h:1.5,yawOff:0,loading:false,fl:.52,yaw:-Math.PI/4,pitch:.78};
 function heroLoad(cb){if(HERO.m)return cb();if(HERO.loading)return;HERO.loading=true;
  new THREE.GLTFLoader().load((typeof A==='function'?A('hero.glb'):'assets/hero.glb'),g=>{const m=g.scene,b=new THREE.Box3().setFromObject(m),s=HERO.h/(b.max.y-b.min.y);m.scale.setScalar(s);b.setFromObject(m);m.position.y-=b.min.y;
-  const w=new THREE.Group(),bd=new THREE.Group();bd.add(m);w.add(bd);m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false}});
+  const w=new THREE.Group(),bd=new THREE.Group();bd.add(m);w.add(bd);HERO.mats=[];m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.frustumCulled=false;(Array.isArray(o.material)?o.material:[o.material]).forEach(x=>{x.transparent=true;HERO.mats.push(x)})}});
   const add=(geo,mat,y)=>{const o=new THREE.Mesh(geo,mat);o.position.y=y;w.add(o);return o},bm=(c,op)=>new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
   // ground effects: dark soft shadow, pulsing cyan rings, and a faint hover column so he clearly floats
   const sh=add(new THREE.CircleGeometry(.8,32),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.35,depthWrite:false}),.04);sh.rotation.x=-Math.PI/2;
   const r1=add(new THREE.RingGeometry(.55,.7,40),bm(0x66e6ff,.7),.07),r2=add(new THREE.RingGeometry(.3,.38,40),bm(0xbff6ff,.8),.08);r1.rotation.x=r2.rotation.x=-Math.PI/2;
-  const col=add(new THREE.CylinderGeometry(.3,.6,HERO.fl+.2,28,1,true),bm(0x66e6ff,.16),(HERO.fl+.2)/2);
+  const col=add(new THREE.CylinderGeometry(.25,.5,HERO.fl+.2,28,1,true),bm(0x66e6ff,.16),(HERO.fl+.2)/2);
   const N=22,pg=new THREE.BufferGeometry(),pa=new Float32Array(N*3);pg.setAttribute('position',new THREE.BufferAttribute(pa,3));
   const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0x8ff0ff,size:.16,map:(typeof softTex==='function'?softTex():null),transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false}));pts.frustumCulled=false;w.add(pts);
   const seed=[];for(let i=0;i<N;i++)seed.push({a:Math.random()*6.28,r:.12+Math.random()*.3,y:Math.random()*HERO.fl,s:.8+Math.random()*.9});
-  HERO.m=w;HERO.body=bd;HERO.sh=sh;HERO.r1=r1;HERO.r2=r2;HERO.col=col;HERO.pa=pa;HERO.pg=pg;HERO.seed=seed;S.add(w);HERO.loading=false;cb()},undefined,()=>{HERO.loading=false})}
-function tppBlocked(x,z){if(Math.abs(x)>57||Math.abs(z)>57)return true;if(wallAt(x,z))return true;for(const c of TPPC){if(Math.hypot(x-c[0],z-c[1])<c[2])return true}return false}
+  HERO.pts=pts;HERO.m=w;HERO.body=bd;HERO.sh=sh;HERO.r1=r1;HERO.r2=r2;HERO.col=col;HERO.pa=pa;HERO.pg=pg;HERO.seed=seed;S.add(w);HERO.loading=false;cb()},undefined,()=>{HERO.loading=false})}
+function tppBush(x,z){return inBush(x,z)||BLF.some(c=>Math.abs(c[0]-x)<1.9&&Math.abs(c[1]-z)<1.9)}
+function tppIn(x,z){return BLV.some(c=>Math.abs(c[0]-x)<1.5&&Math.abs(c[1]-z)<1.5)||(BLV.length>0&&inBush(x,z))}
+// solid models: rays from the hero's body against the spawn platforms and pit walls, plus circles for the base rock arcs
+const WRY=new THREE.Raycaster(),WD=new V3();let TPPA=false;
+function tppArcs(){if(TPPA)return;TPPA=true;[[-40,40,-Math.PI/4],[40,-40,3*Math.PI/4]].forEach(([bx,bz,d])=>{[15.4,16.8].forEach(r=>{for(let a=d-1.9;a<=d+1.9;a+=1.25/r){const x=bx+r*Math.cos(a),z=bz+r*Math.sin(a);if(Math.abs(x)>50||Math.abs(z)>50||segs.some(s=>dist([x,z],s[0],s[1])<3.9))continue;TPPC.push([x,z,1.15])}})})}
+function tppWallHit(F,x,z){const dx=x-F.x,dz=z-F.z,l=Math.hypot(dx,dz);if(l<1e-5)return false;const ms=[];
+ for(const k in SPM){const m=SPM[k];if(Math.hypot(m.position.x-F.x,m.position.z-F.z)<22)ms.push(m)}
+ (window.SOL||[]).forEach(m=>{if(Math.hypot(m.position.x-F.x,m.position.z-F.z)<22)ms.push(m)});
+ if(!ms.length)return false;GO.set(F.x,F.gy+1.2,F.z);WD.set(dx/l,0,dz/l);WRY.set(GO,WD);WRY.far=l+.7;return WRY.intersectObjects(ms,true).length>0}
+function tppBlocked(x,z,mv){if(Math.abs(x)>57||Math.abs(z)>57)return true;if(wallAt(x,z)&&!tppBush(x,z))return true;for(const c of TPPC){if(Math.hypot(x-c[0],z-c[1])<c[2])return true}if(mv&&FPP&&FPP.tp&&tppWallHit(FPP,x,z))return true;return false}
 function tppStart(){if(FPP||TOUR||$('ld'))return;heroLoad(()=>{if(FPP)return;
- FPP={tp:true,yaw:HERO.yaw,pitch:HERO.pitch,dist:27,v:new V3(),x:-40,z:34,face:Math.PI*.75,dest:null,sv:{fov:C.fov,near:C.near}};
+ tppArcs();const SP0=tppFree(SPAWN[0],SPAWN[1]);FPP={tp:true,hp:100,dead:0,yaw:HERO.yaw,pitch:HERO.pitch,dist:27,v:new V3(),x:SP0[0],z:SP0[1],face:Math.PI*.75,dest:null,hid:0,gy:0,gt:0,sv:{fov:C.fov,near:C.near}};
  HERO.m.visible=true;HERO.m.position.set(FPP.x,0,FPP.z);C.near=1;C.fov=45;C.updateProjectionMatrix();C.rotation.order='YXZ';
- document.body.classList.add('fpp');$('fph').innerHTML='<b>TPP &middot; MOBA VIEW</b><br>WASD or right-click = move &middot; Shift = sprint &middot; Scroll = zoom &middot; Esc = exit';$('fph').style.opacity=1;fppHint=performance.now()+6000;fppLast=performance.now()})}
+ document.body.classList.add('fpp');$('fph').innerHTML='<b>TPP &middot; MOBA VIEW</b><br>WASD or right-click = move &middot; Shift = sprint &middot; Scroll = zoom &middot; Esc = exit';$('fph').style.opacity=1;fppHint=performance.now()+6000;fppLast=performance.now();let tg=document.getElementById('htag');if(!tg){tg=document.createElement('div');tg.id='htag';tg.innerHTML='FLOAT-9<span id="hpb"><i id="hpf"></i></span>';document.body.appendChild(tg)}tg.style.display='block'})}
 const tppRay=new THREE.Raycaster(),tppPl=new THREE.Plane(new V3(0,1,0),0),tppP=new V3();
 el.addEventListener('pointerdown',e=>{if(!FPP||!FPP.tp||e.pointerType!=='mouse')return;tppRay.setFromCamera({x:e.clientX/innerWidth*2-1,y:-(e.clientY/innerHeight)*2+1},C);if(tppRay.ray.intersectPlane(tppPl,tppP))FPP.dest=[tppP.x,tppP.z]});
 el.addEventListener('contextmenu',e=>{if(FPP&&FPP.tp)e.preventDefault()});
 addEventListener('wheel',e=>{if(FPP&&FPP.tp)FPP.dist=Math.max(14,Math.min(42,FPP.dist+e.deltaY*.02))},{passive:true});
-function tppTick(dt){const F=FPP;F.yaw=HERO.yaw;F.pitch=HERO.pitch;
+// ---------- Red towers attack the hero when they can see him (in range and not hidden in a bush) ----------
+const NT=bt.length,RTW=bt.map(p=>[-p[0],-p[1]]).concat([[40,-40]]),RTR=RTW.map((q,i)=>i<NT?10:12),RTY=RTW.map((q,i)=>i<NT?4.1:6.5),RTD=RTW.map((q,i)=>i<NT?13:18),RTF=RTW.map((q,i)=>i<NT?1.1:1.6),RTC=RTW.map(()=>0),SPAWN=[-53.5,53.5],TR=10,TPJ=[];// last entry = Red Nexus
+const PJG=new THREE.SphereGeometry(.22,10,8),PJM=new THREE.MeshBasicMaterial({color:0xff5a3c,transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false});
+const TPL=(function(){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6*RTW.length),3));const l=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xff4a3a,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false}));l.frustumCulled=false;l.visible=false;S.add(l);return l})();
+function tppFree(x,z){if(!tppBlocked(x,z))return[x,z];for(let r=1;r<14;r++)for(let a=0;a<16;a++){const q=[x+Math.cos(a/16*6.283)*r,z+Math.sin(a/16*6.283)*r];if(!tppBlocked(q[0],q[1]))return q}return[-40,34]}
+// ground height: the spawn platforms are raised, so the hero rides on top of them (downward ray from just above his feet)
+const GRY=new THREE.Raycaster(),GDN=new V3(0,-1,0),GO=new V3();let GN=0;
+function tppGround(F,dt){const near=Math.hypot(F.x-SPAWN[0],F.z-SPAWN[1])<14||Math.hypot(F.x+SPAWN[0],F.z+SPAWN[1])<14;
+ if(near){if(!(GN++%3)){const ms=[];for(const k in SPM)ms.push(SPM[k]);GO.set(F.x,F.gy+2.4,F.z);GRY.set(GO,GDN);GRY.far=7;const h=ms.length?GRY.intersectObjects(ms,true):[];F.gt=h.length?Math.max(0,h[0].point.y):0}}else F.gt=0;
+ F.gy+=((F.gt||0)-F.gy)*Math.min(1,dt*12)}
+// tower range rings (shown when the hero is near a Red tower; brighter when he is inside the range and visible)
+const RNG=RTW.map((tw,ri)=>{const g=new THREE.Group(),bm=op=>new THREE.MeshBasicMaterial({color:0xff4a3a,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}),r=new THREE.Mesh(new THREE.RingGeometry(RTR[ri]-.18,RTR[ri],72),bm(.25)),f=new THREE.Mesh(new THREE.CircleGeometry(RTR[ri]-.18,48),bm(.04));
+ r.rotation.x=f.rotation.x=-Math.PI/2;g.add(r,f);g.position.set(tw[0],.12,tw[1]);g.visible=false;S.add(g);return{g:g,r:r,f:f}});
+function tppClear(){RNG.forEach(q=>q.g.visible=false);TPJ.forEach(m=>S.remove(m));TPJ.length=0;TPL.visible=false;if(HERO.mats)HERO.mats.forEach(x=>{if(x.emissive)x.emissive.setRGB(0,0,0)})}
+function tppRespawn(F){const q=tppFree(SPAWN[0],SPAWN[1]);F.x=q[0];F.z=q[1];F.v.set(0,0,0);F.dest=null;F.hp=100;F.dead=0;HERO.m.visible=true;RTC.fill(.6);$('fph').style.opacity=0}
+function tppCombat(dt,F,fy){const pa=TPL.geometry.attributes.position.array;let n=0;RNG.forEach((q,i)=>{const d=Math.hypot(F.x-RTW[i][0],F.z-RTW[i][1]),inn=d<RTR[i]&&F.hid<.5&&F.dead<=0;q.g.visible=d<RTR[i]+16;q.r.material.opacity=inn?.6:.22;q.f.material.opacity=inn?.1:.035});
+ if(F.dead>0){F.dead-=dt;if(F.dead<=0)tppRespawn(F)}
+ else{const vis=F.hid<.5;RTW.forEach((tw,i)=>{RTC[i]-=dt;if(vis&&Math.hypot(F.x-tw[0],F.z-tw[1])<RTR[i]){pa[n*6]=tw[0];pa[n*6+1]=RTY[i];pa[n*6+2]=tw[1];pa[n*6+3]=F.x;pa[n*6+4]=fy+HERO.h*.5;pa[n*6+5]=F.z;n++;
+   if(RTC[i]<=0){RTC[i]=RTF[i];const m=new THREE.Mesh(PJG,PJM);m.position.set(tw[0],RTY[i],tw[1]);m.scale.setScalar(i<NT?1:1.7);m.userData.dmg=RTD[i];S.add(m);TPJ.push(m)}}});
+  if(Math.hypot(F.x-SPAWN[0],F.z-SPAWN[1])<10)F.hp=Math.min(100,F.hp+25*dt);else if(!n&&F.hp<100)F.hp=Math.min(100,F.hp+2*dt)}
+ TPL.geometry.setDrawRange(0,n*2);TPL.geometry.attributes.position.needsUpdate=true;TPL.visible=n>0;
+ for(let i=TPJ.length-1;i>=0;i--){const m=TPJ[i],dx=F.x-m.position.x,dy=fy+HERO.h*.5-m.position.y,dz=F.z-m.position.z,d=Math.hypot(dx,dy,dz),st=38*dt;
+  if(d<=st+.5||F.dead>0){if(F.dead<=0){F.hp-=m.userData.dmg||13;HERO.hit=1;if(F.hp<=0){F.hp=0;F.dead=2.8;HERO.m.visible=false;$('fph').innerHTML='<b>YOU WERE SLAIN</b><br>Red defences got you &middot; respawning at Blue Spawn...';$('fph').style.opacity=1;fppHint=performance.now()+2800}}S.remove(m);TPJ.splice(i,1)}
+  else m.position.set(m.position.x+dx/d*st,m.position.y+dy/d*st,m.position.z+dz/d*st)}
+ HERO.hit=Math.max(0,HERO.hit-dt*3);HERO.mats.forEach(x=>{if(x.emissive)x.emissive.setRGB(.8*HERO.hit,.05*HERO.hit,.05*HERO.hit)})}
+function tppTick(dt){const F=FPP;F.yaw=HERO.yaw;F.pitch=HERO.pitch;tppGround(F,dt);
  let fx=(FK.KeyD||FK.ArrowRight?1:0)-(FK.KeyA||FK.ArrowLeft?1:0)+FJ.x,fz=(FK.KeyS||FK.ArrowDown?1:0)-(FK.KeyW||FK.ArrowUp?1:0)+FJ.y;
+ if(F.dead>0){fx=fz=0;F.dest=null}
  let l=Math.hypot(fx,fz);if(l>1){fx/=l;fz/=l}
- const run=(FK.ShiftLeft||FK.ShiftRight||FK.ControlLeft||(FJ.on&&Math.hypot(FJ.x,FJ.y)>.95)),sp=4.2*(run?1.6:1),sy=Math.sin(F.yaw),cy=Math.cos(F.yaw);
+ const run=(FK.ShiftLeft||FK.ShiftRight||FK.ControlLeft||(FJ.on&&Math.hypot(FJ.x,FJ.y)>.95)),sp=5.0*(run?1.6:1),sy=Math.sin(F.yaw),cy=Math.cos(F.yaw);
  let tx=(fx*cy+fz*sy)*sp,tz=(-fx*sy+fz*cy)*sp;
  if(l>.05)F.dest=null;else if(F.dest){const dx=F.dest[0]-F.x,dz=F.dest[1]-F.z,d=Math.hypot(dx,dz);if(d<.4)F.dest=null;else{tx=dx/d*sp;tz=dz/d*sp}}
  const k=Math.min(1,dt*12);F.v.x+=(tx-F.v.x)*k;F.v.z+=(tz-F.v.z)*k;
  const nx=F.x+F.v.x*dt,nz=F.z+F.v.z*dt;let hit=false;
- if(!tppBlocked(nx,F.z))F.x=nx;else{F.v.x=0;hit=true}if(!tppBlocked(F.x,nz))F.z=nz;else{F.v.z=0;hit=true}if(hit&&l<.05)F.dest=null;
+ if(!tppBlocked(nx,F.z,1))F.x=nx;else{F.v.x=0;hit=true}if(!tppBlocked(F.x,nz,1))F.z=nz;else{F.v.z=0;hit=true}if(hit&&l<.05)F.dest=null;
  const spd=Math.hypot(F.v.x,F.v.z);if(spd>.4){let d=Math.atan2(F.v.x,F.v.z)-F.face;d=Math.atan2(Math.sin(d),Math.cos(d));F.face+=d*Math.min(1,dt*10)}
  const t=performance.now()/1000,m=HERO.m,fy=HERO.fl+Math.sin(t*2.2)*.08;
- m.position.set(F.x,0,F.z);m.rotation.y=F.face+HERO.yawOff;HERO.body.position.y=fy;HERO.body.rotation.x=Math.min(.2,spd*.028);
- const pu=1+Math.sin(t*3)*.07,hs=1-(fy-HERO.fl)*.25;HERO.sh.scale.setScalar(hs);HERO.r1.scale.setScalar(pu);HERO.r2.scale.setScalar(1.1-Math.sin(t*3)*.1);HERO.col.material.opacity=.13+.05*Math.sin(t*4);
+ m.position.set(F.x,F.gy,F.z);m.rotation.y=F.face+HERO.yawOff;HERO.body.position.y=fy;HERO.body.rotation.x=Math.min(.2,spd*.028);
+ const pu=1+Math.sin(t*3)*.07,hs=1-(fy-HERO.fl)*.25;HERO.sh.scale.setScalar(hs*.82);HERO.r1.scale.setScalar(pu*.82);HERO.r2.scale.setScalar((1.1-Math.sin(t*3)*.1)*.82);
  for(let i=0;i<HERO.seed.length;i++){const p=HERO.seed[i];p.y-=dt*p.s*1.4;if(p.y<.05){p.y=fy-.3;p.a=Math.random()*6.28;p.r=.12+Math.random()*.32}HERO.pa[i*3]=Math.cos(p.a)*p.r*(1+(1-p.y/(fy+.1))*.5);HERO.pa[i*3+1]=p.y;HERO.pa[i*3+2]=Math.sin(p.a)*p.r*(1+(1-p.y/(fy+.1))*.5)}HERO.pg.attributes.position.needsUpdate=true;
- const cp=Math.cos(F.pitch),d=F.dist;C.position.set(F.x+Math.sin(F.yaw)*cp*d,Math.sin(F.pitch)*d+.5,F.z+Math.cos(F.yaw)*cp*d);C.lookAt(F.x,.7,F.z);
+ tppCombat(dt,F,fy+F.gy);const inB=tppIn(F.x,F.z);F.hid+=((inB?1:0)-F.hid)*Math.min(1,dt*6);const al=1-.7*F.hid,ef=1-.92*F.hid;
+ HERO.mats.forEach(x=>{x.opacity=al});HERO.sh.material.opacity=.35*ef;HERO.r1.material.opacity=.7*ef;HERO.r2.material.opacity=.8*ef;HERO.col.material.opacity=(.13+.05*Math.sin(t*4))*ef;HERO.pts.material.opacity=.8*ef;
+ {const tg=document.getElementById('htag');if(tg){const v=new V3(F.x,fy+F.gy+HERO.h+.45,F.z).project(C);if(v.z>1)tg.style.display='none';else{tg.style.display=F.dead>0?'none':'block';tg.style.left=((v.x+1)/2*innerWidth)+'px';tg.style.top=((1-v.y)/2*innerHeight)+'px';tg.style.opacity=1-.75*F.hid;const hf=document.getElementById('hpf');if(hf){hf.style.width=F.hp+'%';hf.style.background=F.hp<35?'linear-gradient(#ff7a6a,#c0392b)':'linear-gradient(#6fe39a,#1f9a4a)'}}}}
+ const cp=Math.cos(F.pitch),d=F.dist;C.position.set(F.x+Math.sin(F.yaw)*cp*d,Math.sin(F.pitch)*d+.5+F.gy,F.z+Math.cos(F.yaw)*cp*d);C.lookAt(F.x,.7+F.gy,F.z);
  if(performance.now()>fppHint)$('fph').style.opacity=0}
 // ---------- graphics quality: High (default) / Optimized / Mobile ----------
-const GFX={high:{pr:2,sh:1,sm:4096,soft:1,lt:1,pt:1,an:16,fps:0},optimized:{pr:1.5,sh:1,sm:2048,soft:0,lt:1,pt:.5,an:4,fps:0},mobile:{pr:1,sh:0,sm:1024,soft:0,lt:0,pt:0,an:1,fps:30}};
-let GQ='high',GQF=0,GQT=0;const ANI=new WeakMap();
-function gfxFresh(c){S.traverse(o=>{if(o.isPointLight)o.visible=!!c.lt;if(o.isPoints&&o.geometry.attributes.position){if(o.userData.n0===undefined)o.userData.n0=o.geometry.attributes.position.count;o.visible=c.pt>0;o.geometry.setDrawRange(0,Math.ceil(o.userData.n0*c.pt))}})}
+const GFX={high:{tx:4096,pr:2,pm:1.5,sh:1,sm:4096,soft:1,lt:1,pt:1,an:16,fps:0,kb:3,ki:1.2},optimized:{tx:1024,mn:.75,pr:1.25,sh:1,sm:1024,soft:0,lt:0,pt:.25,an:2,fps:0,su:3,ad:1,kb:5,ki:1.4},mobile:{tx:256,mn:.5,pr:.75,sh:0,sm:1024,soft:0,lt:0,pt:0,an:1,fps:30,ad:1,kb:14,ki:2.5}};
+let GQ='high',GQF=0,GQT=0,GQN=0;const GQA={pr:2,s:0,c:0,l:0};const ANI=new WeakMap();
+// thin out the outer border band (rocks, pines, slabs outside the lanes) in Optimized / Mobile; High keeps everything
+function gfxThin(c){const key=c.kb+'/'+c.ki;const RK=['rock_a','rock_b','spire','cliff2','rubble'];S.traverse(o=>{if(!o.isInstancedMesh||o.userData.nt||o.userData.q===key)return;if(typeof MD!=='undefined'&&MD.cliff&&o.geometry===MD.cliff.g)return;
+ const u=o.userData;if(!u.full){if(o.count<30)return;u.full=o.instanceMatrix.array.slice();u.fc=o.instanceColor?o.instanceColor.array.slice():null;u.n=o.count;u.rk=typeof MD!=='undefined'&&RK.some(n=>MD[n]&&MD[n].g===o.geometry)}
+ const f=u.full,n=u.n,a=o.instanceMatrix.array,ca=o.instanceColor?o.instanceColor.array:null,kb=u.rk?c.kb:Math.max(1,c.kb/2),ki=u.rk?c.ki:Math.max(1,c.ki/1.5);let w=0;
+ for(let i=0;i<n;i++){const x=f[i*16+12],z=f[i*16+14],k=Math.max(Math.abs(x),Math.abs(z))>42?kb:ki;if(k>1&&(Math.imul(i+1,2654435761)>>>0)/4294967296>=1/k)continue;
+  for(let j=0;j<16;j++)a[w*16+j]=f[i*16+j];if(ca&&u.fc)for(let j=0;j<3;j++)ca[w*3+j]=u.fc[i*3+j];w++}
+ o.count=w;o.instanceMatrix.needsUpdate=true;if(o.instanceColor)o.instanceColor.needsUpdate=true;u.q=key})}
+const TXO=new WeakMap();
+function gfxTex(max){const seen=new Set();S.traverse(o=>{if(!o.material)return;(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>{['map','normalMap','emissiveMap','roughnessMap','metalnessMap','aoMap','alphaMap'].forEach(k=>{const t=m[k];if(!t||seen.has(t)||t.isCompressedTexture||t.isDataTexture)return;seen.add(t);const im=t.image;if(!im||!im.width)return;if(!TXO.has(t))TXO.set(t,im);
+ const o0=TXO.get(t),s=Math.min(1,max/Math.max(o0.width,o0.height)),tw=Math.max(1,Math.round(o0.width*s)),th=Math.max(1,Math.round(o0.height*s));let tg=o0;
+ if(s<1){if(t.image!==o0&&t.image.width===tw)return;const c=document.createElement('canvas');c.width=tw;c.height=th;c.getContext('2d').drawImage(o0,0,0,tw,th);tg=c}else if(t.image===o0)return;
+ t.image=tg;t.needsUpdate=true})})})}
+function gfxFresh(c){gfxThin(c);gfxTex(c.tx);try{EM.forEach(s=>s.visible=GQ!=='mobile')}catch(e){}S.traverse(o=>{if(o.isPointLight)o.visible=!!c.lt;if(o.isPoints&&o.geometry.attributes.position){if(o.userData.n0===undefined)o.userData.n0=o.geometry.attributes.position.count;o.visible=c.pt>0;o.geometry.setDrawRange(0,Math.ceil(o.userData.n0*c.pt))}})}
 function applyGfx(k){const c=GFX[k];if(!c)return;GQ=k;GQF=c.fps;
- R.setPixelRatio(Math.min(devicePixelRatio,c.pr));R.setSize(innerWidth,innerHeight);
- R.shadowMap.enabled=!!c.sh;R.shadowMap.type=c.soft?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;sun.castShadow=!!c.sh;
+ R.setPixelRatio(Math.min(Math.max(devicePixelRatio,c.pm||0),c.pr));R.setSize(innerWidth,innerHeight);
+ R.shadowMap.enabled=!!c.sh;R.shadowMap.autoUpdate=!(c.su>1);R.shadowMap.needsUpdate=true;GQA.pr=c.pr;GQA.s=GQA.c=GQA.l=0;R.shadowMap.type=c.soft?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;sun.castShadow=!!c.sh;
  const m=Math.min(c.sm,R.capabilities.maxTextureSize);if(sun.shadow.mapSize.x!==m){sun.shadow.mapSize.set(m,m);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
  gfxFresh(c);
  S.traverse(o=>{if(!o.material)return;(Array.isArray(o.material)?o.material:[o.material]).forEach(mt=>{mt.needsUpdate=true;const t=mt.map;if(t&&t.anisotropy!==undefined){if(!ANI.has(t))ANI.set(t,t.anisotropy);const a=Math.min(ANI.get(t),c.an);if(t.anisotropy!==a){t.anisotropy=a;t.needsUpdate=true}}})});
  document.querySelectorAll('#gx button').forEach(b=>b.classList.toggle('on',b.dataset.g===k))}
-function pickGfx(k){applyGfx(k);try{localStorage.setItem('gfxq',k)}catch(e){}}
+function pickGfx(k){let ok=false;try{sessionStorage.setItem('gfxq',k);ok=sessionStorage.getItem('gfxq')===k}catch(e){}if(ok&&(k==='mobile')!==AAOFF){location.reload();return}applyGfx(k)}
 function togGfx(){const o=document.getElementById('gx').classList.toggle('open');const b=document.getElementById('gb');b.classList.toggle('on',o);b.innerHTML='Graphics '+(o?'&#9662;':'&#9656;')}
-try{const q=localStorage.getItem('gfxq');if(GFX[q]&&q!=='high')applyGfx(q)}catch(e){}
-setInterval(()=>{if(GQ!=='high')gfxFresh(GFX[GQ])},2000);
-(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);R.render(S,C);
+try{const q=sessionStorage.getItem('gfxq');if(GFX[q]&&q!=='high')applyGfx(q)}catch(e){}
+setInterval(()=>{if(GQ==='high')gfxThin(GFX.high);else gfxFresh(GFX[GQ])},1000);
+(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(innerWidth,innerHeight)}}}
  labTick();
  if(TOUR)tourUI();requestAnimationFrame(loop)})();
 </script></body></html>
