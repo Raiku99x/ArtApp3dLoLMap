@@ -159,9 +159,13 @@ body.eg #egl i{height:9vh}
 #egt{position:fixed;left:0;right:0;top:50%;text-align:center;z-index:36;pointer-events:none;opacity:0;transition:opacity .4s;font:700 12px/1 'Cinzel',Georgia,serif;letter-spacing:.34em;color:#f0e6d2;text-shadow:0 0 12px #c8aa6e,0 1px 3px #000}
 body.egw #egt{opacity:.85}
 body.eg #ui,body.eg #fsb,body.eg .l,body.eg #htag,body.eg #fp{opacity:0!important;pointer-events:none!important}
+#egx{position:fixed;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border:2px solid rgba(255,214,120,.8);border-radius:50%;box-sizing:border-box;pointer-events:none;z-index:30;opacity:0;transform:scale(.8);transition:opacity .25s,transform .25s,box-shadow .25s}
+#egx:after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px;border-radius:50%;background:#ffe6a0}
+#egx.n{opacity:.5}#egx.a{opacity:1;transform:scale(1.15);box-shadow:0 0 12px rgba(255,190,70,.9),inset 0 0 6px rgba(255,190,70,.6)}
+body.eg #egx{opacity:0!important}
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
 <div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="tourStart()">&#9654; Visual Analysis</button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
-<button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span></div></div>
+<button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span><button id="mub" class="on" onclick="togMusic()">Music: On</button></div></div>
 <div id="va"><div class="vg"></div><div class="lb t"></div><div id="vh"><i></i>REC &middot; DRONE CAM<span id="valt"></span></div><div id="vhint"></div>
 <div class="lb b"><div id="vc"><button id="vpv" title="Previous (&larr;)">&#9198;</button><button id="vpl" title="Pause / play (space)">&#10074;&#10074;</button><button id="vnx" title="Next (&rarr;)">&#9197;</button><div id="vt"></div><button id="vx" title="Close (Esc)">&#10005;</button></div></div>
 <svg id="vsv"><line id="vln" x1="0" y1="0" x2="0" y2="0"/></svg><div id="vrt"><b></b></div>
@@ -170,7 +174,7 @@ body.eg #ui,body.eg #fsb,body.eg .l,body.eg #htag,body.eg #fp{opacity:0!importan
 <button id="fsb" onclick="togFs()" title="Full screen and landscape" aria-label="Full screen and landscape"></button>
 <div id="mi" role="dialog" aria-modal="true" aria-labelledby="mit"><div class="mc"><h2 id="mit">Viewing on a phone?</h2><p>The map looks best <b>full screen in landscape</b>. Tap the button below and the map switches to full screen landscape.</p><p class="mn">On mobile the map is drawn at a lower resolution (Optimized graphics) so it runs smoothly. You can change this any time in <b>Menu &#9656; Graphics</b>.</p><div class="mb"><button id="mif">Full screen &amp; landscape</button><button id="mic" class="g">Continue as is</button></div></div></div>
 <div id="cre"><b>CREATOR</b><i>tap to go back</i></div>
-<div id="egl"><i></i><i></i></div><div id="egt">SOMETHING STIRS&hellip;</div><div id="ld">Loading models…</div>
+<div id="egl"><i></i><i></i></div><div id="egx"></div><div id="egt">SOMETHING STIRS&hellip;</div><div id="ld">Loading models…</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
@@ -1137,7 +1141,7 @@ function scTick(){const n=performance.now(),S0=SCN;
 // Two of them, point-mirrored through the middle of the map like everything else: a golden rock by the Baron river (statue 1) and by the Dragon river (statue 2).
 // Click / tap the rock. The statue surfaces, the camera circles it at waist height for 240 degrees, it sinks again and the camera returns to where you were.
 let EGG=null;
-const EGC={u:.8,h:2.6,R:3.1,fov:58,wy:.55,a:240},EGT={in:2.2,orb:8.6,sink:2.6,out:1.8,rise:2.6};
+const EGC={u:.8,h:2.6,R:3.1,fov:58,wy:.55,a:240},EGT={in:2.2,rip:2.3,riseAt:3.3,orbAt:4.9,orb:8.6,sink:3.4,out:1.8,rise:2.6};
 const EGS=[{sg:1,file:'renebi'},{sg:-1,file:'jinx'}];
 const egS0=new THREE.CatmullRomCurve3([[-32,-32],[-27,-23.5],[-16.5,-12.5],[-6,-5.6]].map(p=>new V3(p[0],0,p[1])),false,'centripetal').getPointAt(EGC.u);
 EGS.forEach(d=>{d.pos=new V3(egS0.x*d.sg,0,egS0.z*d.sg);d.c=new V3();d.rip=[];d.spD=[];d.rock=null;d.W=null;d.P=null});
@@ -1164,7 +1168,12 @@ function eggMake(d,m4){const n='rock_b',
  sp.geometry.setAttribute('position',new THREE.BufferAttribute(pa,3));sp.frustumCulled=false;S.add(sp);
  for(let i=0;i<N;i++)d.spD.push([Math.random()*6.28,Math.random(),.5+Math.random()*.9,.25+Math.random()*.5]);
  d.rock=r;d.c.copy(c);d.halo=halo;d.sp=sp;d.sz=Math.max(sz.x,sz.z)*.5;d.top=bb.max.y-bb.min.y}
-function eggFx(){const t=performance.now()/1000,e=.5+.5*Math.sin(t*2.2);
+// small crosshair in first person (mouse look), only when a golden rock is close and in front of you; it lights up when a click would hit
+function eggXh(){const x=$('egx');if(!x)return;let st='';if(FPP&&!EGG&&!isTouch){const f=egL.set(0,0,-1).applyQuaternion(C.quaternion);
+  for(const d of EGS){if(!d.rock)continue;const dist=C.position.distanceTo(d.c);if(dist>14)continue;const v=egP.copy(d.c).sub(C.position).normalize();if(f.dot(v)<.85)continue;
+   egRay.ray.origin.copy(C.position);egRay.ray.direction.copy(f);if(egRay.ray.distanceToPoint(d.c)<Math.max(1.6,dist*.26)){st='a';break}st='n'}}
+ if(x.className!==st)x.className=st}
+function eggFx(){eggXh();const t=performance.now()/1000,e=.5+.5*Math.sin(t*2.2);
  EGS.forEach(d=>{if(!d.rock)return;d.rock.material.emissiveIntensity=.1+.28*e;d.halo.material.opacity=(.28+.3*e)*Math.min(1,Math.max(.12,C.position.distanceTo(d.c)/16));d.halo.scale.setScalar(d.halo.userData.s*(.9+.2*e));
   if(GQ==='mobile'){d.sp.visible=false;return}const pa=d.sp.geometry.attributes.position;
   for(let i=0;i<d.spD.length;i++){const q=d.spD[i],k=(t*q[3]*.35+q[1])%1,a=q[0]+t*q[2]*.6,rr=d.sz*(.5+.7*k);pa.setXYZ(i,d.c.x+Math.cos(a)*rr,d.c.y-d.top*.3+k*d.top*1.7,d.c.z+Math.sin(a)*rr)}
@@ -1186,29 +1195,30 @@ function eggHit(d,nx,ny,fpp,locked){if(!d.rock)return -1;C.updateMatrixWorld();e
 function eggStart(d){if(EGG||TOUR||SCN||$('ld'))return;EGG={t0:0,sv:null,d};document.body.classList.add('eg','egw');
  loadEgg(d).then(W=>{if(!EGG||EGG.t0)return;document.body.classList.remove('egw');if(!W){EGG=null;document.body.classList.remove('eg');return}
   const E=EGG,sv={pos:C.position.clone(),q:C.quaternion.clone(),fov:C.fov,near:C.near,fpp:!!FPP,yaw:FPP?FPP.yaw:0,pitch:FPP?FPP.pitch:0};E.sv=sv;
-  const a0=Math.atan2(sv.pos.x-d.pos.x,sv.pos.z-d.pos.z),ar=Math.atan2(d.c.x-d.pos.x,d.c.z-d.pos.z),wr=a=>Math.abs(((a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI);
-  let best=1,bd=-1;[1,-1].forEach(sg=>{let m=9;for(let s=0;s<=EGC.a;s+=6)m=Math.min(m,wr(a0+sg*s*Math.PI/180-ar));if(m>bd){bd=m;best=sg}});
-  E.a0=a0;E.sgn=best;E.wy=.02+EGC.h*EGC.wy;E.sinkAt=EGT.in+EGT.orb;E.angEnd=a0+best*EGC.a*Math.PI/180;
-  W.rotation.y=a0;W.position.set(d.pos.x,-EGC.h-.2,d.pos.z);W.visible=false;d.glow.visible=true;d.rip.forEach(r=>r.visible=false);C.near=.1;E.t0=performance.now()})}
-function eggAng(E,t){const tb=E.sinkAt;if(t>=tb)return E.angEnd+E.sgn*(Math.PI/30)*egE(Math.min(1,(t-tb)/EGT.sink));
- return E.a0+E.sgn*EGC.a*Math.PI/180*egE(Math.min(1,Math.max(0,(t-EGT.in)/EGT.orb)))}
-function eggSkip(){const E=EGG;if(!E||!E.t0)return;const t=(performance.now()-E.t0)/1000;if(t<3||t>=E.sinkAt)return;E.angEnd=eggAng(E,t);E.sinkAt=t}
-function eggFinish(restore){const E=EGG;if(!E)return;const d=E.d;if(d.W)d.W.visible=false;d.rip.forEach(r=>r.visible=false);if(d.glow)d.glow.visible=false;
+  const ar=Math.atan2(d.c.x-d.pos.x,d.c.z-d.pos.z),th=ar+Math.PI*5/6;
+  E.a0=th-Math.PI/2;E.sgn=1;E.wy=.02+EGC.h*EGC.wy;E.sinkAt=EGT.orbAt+EGT.orb;E.angEnd=E.a0+EGC.a*Math.PI/180;
+  W.rotation.y=th;W.position.set(d.pos.x,-EGC.h-.2,d.pos.z);W.visible=false;d.glow.visible=true;d.rip.forEach(r=>r.visible=false);C.near=.1;E.t0=performance.now()})}
+function eggAng(E,t){const tb=E.sinkAt;if(t>=tb)return E.angEnd+E.sgn*(Math.PI/6)*egE(Math.min(1,(t-tb)/EGT.sink));
+ return E.a0+E.sgn*EGC.a*Math.PI/180*egE(Math.min(1,Math.max(0,(t-EGT.orbAt)/EGT.orb)))}
+function eggSkip(){const E=EGG;if(!E||!E.t0)return;const t=(performance.now()-E.t0)/1000;if(t<EGT.orbAt+1||t>=E.sinkAt)return;E.angEnd=eggAng(E,t);E.sinkAt=t}
+function eggFinish(restore){const E=EGG;if(!E)return;const d=E.d;egSfxStop();if(d.W)d.W.visible=false;d.rip.forEach(r=>r.visible=false);if(d.glow)d.glow.visible=false;
  if(restore&&E.sv){const sv=E.sv;C.position.copy(sv.pos);C.quaternion.copy(sv.q);C.fov=sv.fov;C.near=sv.near;C.updateProjectionMatrix();if(FPP){FPP.yaw=sv.yaw;FPP.pitch=sv.pitch;FPP.v.set(0,0,0);fppLast=performance.now()}}
  document.body.classList.remove('eg','egw');EGG=null}
 function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now(),t=(now-E.t0)/1000,sv=E.sv,h=EGC.h;
  if(sv.fpp&&!FPP){eggFinish(false);return}
  const tc=E.sinkAt+EGT.sink,td=tc+EGT.out,W=d.W;
  // statue: rises out of the river bed, later sinks back under it
- let y=-(h+.2)+(h+.22)*egO(Math.min(1,Math.max(0,(t-.3)/EGT.rise)));
+ let y=-(h+.2)+(h+.22)*egO(Math.min(1,Math.max(0,(t-EGT.riseAt)/EGT.rise)));
  if(t>=E.sinkAt)y=.02-(h+.25)*egI(Math.min(1,(t-E.sinkAt)/EGT.sink));
- W.position.y=y;W.visible=y>-h-.12;
+ W.position.y=y;W.visible=y>-h-.12;if(d.file==='renebi')egSfx(E,t,y,h);
  // ripples on the water at the start of the rise and of the sink
- const starts=[.3,.85,1.4,E.sinkAt,E.sinkAt+.55,E.sinkAt+1.1];
+ const starts=[EGT.rip,EGT.rip+.8,EGT.rip+1.6,E.sinkAt,E.sinkAt+.55,E.sinkAt+1.1];
  d.rip.forEach((r,i)=>{const lt=(t-starts[i])/2.3;if(lt<0||lt>1){r.visible=false;return}r.visible=true;r.scale.setScalar(1+lt*5.5);r.material.opacity=.42*Math.pow(1-lt,1.6)});
- const gk=Math.min(1,Math.max(0,(t-.3)/EGT.rise))*(1-Math.min(1,Math.max(0,(t-E.sinkAt)/EGT.sink)));d.glow.material.opacity=.5*gk;
+ const gk=Math.min(1,Math.max(0,(t-EGT.rip)/(EGT.riseAt+EGT.rise-EGT.rip)))*(1-Math.min(1,Math.max(0,(t-E.sinkAt)/EGT.sink)));d.glow.material.opacity=.5*gk;
  // camera: fly in, circle the statue at waist height, hold while it sinks, fly back
- const az=eggAng(E,t);egP.set(d.pos.x+Math.sin(az)*EGC.R,E.wy,d.pos.z+Math.cos(az)*EGC.R);egL.set(d.pos.x,E.wy,d.pos.z);
+ const az=eggAng(E,t);let rr=EGC.R+.7*(1-egE(Math.min(1,Math.max(0,(t-EGT.in)/(EGT.orbAt-EGT.in))))),cy=E.wy,ly=E.wy;
+ if(t>=E.sinkAt){const sp=Math.min(1,(t-E.sinkAt)/EGT.sink),sk=egI(Math.min(1,(t-E.sinkAt)/1.0)),ty=Math.max(.3,y+h*.5);ly=E.wy+(ty-E.wy)*sk;cy=E.wy+(Math.max(.85,ty+.25)-E.wy)*sk;rr+=.55*egE(sp)}
+ egP.set(d.pos.x+Math.sin(az)*rr,cy,d.pos.z+Math.cos(az)*rr);egL.set(d.pos.x,ly,d.pos.z);
  egCam.position.copy(egP);egCam.lookAt(egL);egQ.copy(egCam.quaternion);
  if(t<EGT.in){const k=scEase(t/EGT.in);C.position.lerpVectors(sv.pos,egP,k);C.quaternion.copy(sv.q).slerp(egQ,k);C.fov=sv.fov+(EGC.fov-sv.fov)*k}
  else if(t<tc){C.position.copy(egP);C.quaternion.copy(egQ);C.fov=EGC.fov}
@@ -1218,7 +1228,7 @@ function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now()
  if(t>=td)eggFinish(true)}
 (function(){const el2=R.domElement,pd=new Map();
  el2.addEventListener('pointerdown',e=>{pd.set(e.pointerId,{x:e.clientX,y:e.clientY,t:performance.now(),multi:pd.size>0});if(pd.size>1)pd.forEach(v=>v.multi=true)});
- const up=e=>{const p=pd.get(e.pointerId);pd.delete(e.pointerId);if(!p||p.multi||e.type==='pointercancel')return;
+ const up=e=>{const p=pd.get(e.pointerId);pd.delete(e.pointerId);if(!p||p.multi||e.type==='pointercancel')return;if(e.pointerType==='mouse'&&e.button!==0)return;
   const lk=document.pointerLockElement===el2;if(!lk&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>8)return;if(performance.now()-p.t>600)return;
   if(EGG){eggSkip();return}if(TOUR||SCN||$('ld'))return;
   const x=lk?VPW()/2:p.x,y=lk?VPH()/2:p.y;let bd=null,bs=1e9;
@@ -1226,6 +1236,28 @@ function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now()
  el2.addEventListener('pointerup',up);el2.addEventListener('pointercancel',up);
  document.addEventListener('keydown',e=>{if(EGG&&e.key==='Escape')eggSkip()});
  setTimeout(()=>{if(GQ!=='mobile')loadEgg(EGS[0])},9000);setTimeout(()=>{if(GQ!=='mobile')loadEgg(EGS[1])},18000)})();
+// ---------- sound: Aurelion Sol background loop (menu toggle, on by default) + Renebi statue showcase sound effects ----------
+// Background: assets/aurelion_sol.mp3 loops forever, low and subtle (BG_BASE); 20% louder during Visual Analysis (BG_VA); ducked while the Renebi showcase plays.
+// Browsers block sound until the first tap/click/key, so it starts on the first interaction. Note: iOS Safari ignores audio.volume (always full volume).
+// Renebi showcase only (Jinx has no sound): assets/music.mp3 when the circling starts, assets/mamaaa.mp3 when the statue is half under the river.
+const BG_BASE=.10,BG_VA=1.2,BG_DUCK=.45;
+const BGM=new Audio('assets/aurelion_sol.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;
+let musicOn=true,bgmV=0,bgmLast=performance.now();
+function bgmTarget(){if(!musicOn||document.hidden)return 0;let v=BG_BASE;if(TOUR&&!TOUR.focus)v*=BG_VA;if(EGG&&EGG.d.file==='renebi')v*=BG_DUCK;return v}
+function bgmTick(){const n=performance.now(),dt=Math.min(.1,(n-bgmLast)/1000);bgmLast=n;const tg=bgmTarget();bgmV+=(tg-bgmV)*Math.min(1,dt*3);
+ try{BGM.volume=Math.min(1,Math.max(0,bgmV))}catch(e){}if(tg===0&&bgmV<.002&&!BGM.paused)BGM.pause()}
+function bgmPlay(){if(!musicOn||!BGM.paused)return Promise.resolve();try{const p=BGM.play();return p&&p.then?p.catch(()=>{throw 0}):Promise.resolve()}catch(e){return Promise.reject()}}
+function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.classList.toggle('on',musicOn);b.textContent='Music: '+(musicOn?'On':'Off');if(musicOn)bgmPlay().catch(()=>{})}
+(function(){const evs=['pointerdown','keydown','touchend'],go=()=>{bgmPlay().then(()=>{if(!BGM.paused)evs.forEach(e=>removeEventListener(e,go,true))},()=>{})};
+ evs.forEach(e=>addEventListener(e,go,true));go();
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)bgmPlay().catch(()=>{})})})();
+const SFX={mus:new Audio('assets/music.mp3'),mam:new Audio('assets/mamaaa.mp3')};SFX.mus.preload=SFX.mam.preload='auto';
+function egSfxPlay(a){try{a.currentTime=0;a.volume=1;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function egSfxStop(){[SFX.mus,SFX.mam].forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}})}
+function egSfx(E,t,y,h){
+ if(!E.mus&&t>=EGT.orbAt&&t<E.sinkAt){E.mus=1;egSfxPlay(SFX.mus)}                       // circling starts
+ if(E.mus&&t>=E.sinkAt&&!SFX.mus.paused){const f=1-(t-E.sinkAt)/.5;if(f<=0)SFX.mus.pause();else SFX.mus.volume=f}  // cut if skipped to the sink
+ if(!E.mam&&t>=E.sinkAt&&y<=-h*.5){E.mam=1;egSfxPlay(SFX.mam)}}                         // statue is half under the water
 // ---------- full screen + landscape (button shows on small screens only; see #fsb in the CSS) ----------
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
 const FSI='<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',FXI='<svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
@@ -1244,7 +1276,7 @@ fsLabel();
  if(seen||!(VPW()<760||VPH()<520))return;mi.classList.add('on');
  const done=()=>{mi.classList.remove('on');try{sessionStorage.setItem('riftIntro','1')}catch(e){}};
  document.getElementById('mif').onclick=()=>{done();togFs()};document.getElementById('mic').onclick=done})();
-(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();eggFx();if(EGG)eggTick();else if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(VPW(),VPH())}}}
+(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();eggFx();bgmTick();if(EGG)eggTick();else if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(VPW(),VPH())}}}
  labTick();
  if(TOUR)tourUI();requestAnimationFrame(loop)})();
 </script></body></html>
