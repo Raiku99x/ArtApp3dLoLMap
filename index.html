@@ -145,10 +145,16 @@ body.fpp #fsb{right:calc(64px + env(safe-area-inset-right,0px))}
 #va:not(.nr) #vbox .vk{font-size:12px}#va:not(.nr) #vbox .vtt{font-size:10px;margin:2px 0 4px}#va:not(.nr) #vbox p{font-size:10.5px;line-height:1.4}
 #vrt{width:34px;height:34px;margin:-17px 0 0 -17px}
 }
+
+/* when the tour / preview has finished: any tap or key closes it */
+#vhint{position:absolute;left:0;right:0;top:0;height:var(--tb);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);display:flex;align-items:center;justify-content:center;font:700 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.14em;text-transform:uppercase;color:#9be6f7;pointer-events:none;opacity:0;transition:opacity .6s}
+#va.dn #vhint{opacity:1;animation:vhp 1.6s ease-in-out infinite}
+@keyframes vhp{50%{opacity:.45}}
+@media(min-width:760px) and (min-height:521px){#vhint{font-size:11px}}
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
 <div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="tourStart()">&#9654; Visual Analysis</button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
 <button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span></div></div>
-<div id="va"><div class="vg"></div><div class="lb t"></div><div id="vh"><i></i>REC &middot; DRONE CAM<span id="valt"></span></div>
+<div id="va"><div class="vg"></div><div class="lb t"></div><div id="vh"><i></i>REC &middot; DRONE CAM<span id="valt"></span></div><div id="vhint"></div>
 <div class="lb b"><div id="vc"><button id="vpv" title="Previous (&larr;)">&#9198;</button><button id="vpl" title="Pause / play (space)">&#10074;&#10074;</button><button id="vnx" title="Next (&rarr;)">&#9197;</button><div id="vt"></div><button id="vx" title="Close (Esc)">&#10005;</button></div></div>
 <svg id="vsv"><line id="vln" x1="0" y1="0" x2="0" y2="0"/></svg><div id="vrt"><b></b></div>
 <div id="vbox"><div class="vk"></div><div class="vtt"></div><p><span class="a"></span><span class="b"></span></p></div></div>
@@ -842,7 +848,7 @@ function tourTick(){const T=TOUR,now=performance.now(),dt=Math.min(.05,(now-T.la
  C.position.copy(P);C.lookAt(L);T.look.copy(L);if(Math.abs(C.fov-fov)>.01){C.fov=fov;C.updateProjectionMatrix()}
  FM=st.fm||1;FXK+=(((!T.ex&&st.fx)?1:0)-FXK)*Math.min(1,dt*2.5);FX.visible=FXK>.02;const pu=.75+.25*Math.sin(tm*3);FXM.forEach(m=>m.opacity=.6*FXK*pu)}
 const _pt=new V3();
-function tourUI(){const T=TOUR;if(!T)return;$('va').classList.toggle('nr',NARROW());$('valt').textContent='ALT '+Math.max(0,Math.round(C.position.y*1.2))+' m';
+function tourUI(){const T=TOUR;if(!T)return;$('va').classList.toggle('nr',NARROW());const dn=!!(T.done&&!T.ex);if(dn&&!T.dt0)T.dt0=performance.now();if(!dn)T.dt0=0;$('va').classList.toggle('dn',dn);if(dn)$('vhint').textContent=matchMedia('(pointer:coarse)').matches?'Tap anywhere to exit':'Press any key to exit';$('valt').textContent='ALT '+Math.max(0,Math.round(C.position.y*1.2))+' m';
  const bx=$('vbox'),rt=$('vrt'),ln=$('vln');if(T.ex){bx.classList.remove('on');rt.classList.remove('on');ln.style.opacity=0;return}
  const st=STS[T.i],tot=st.fl+st.dw,t0=st.fl*.55,vis=T.s>t0&&(T.s<tot-.6||T.done);bx.classList.toggle('on',vis);
  const n=Math.max(0,Math.min(st.tx.length,Math.floor((T.s-t0)*46))),key=T.i+':'+n;
@@ -869,7 +875,8 @@ $('vpv').onclick=()=>{if(TOUR&&!TOUR.ex)goTo(Math.max(0,TOUR.i-1))};
 $('vnx').onclick=()=>{if(TOUR&&!TOUR.ex&&TOUR.i<STS.length-1)goTo(TOUR.i+1)};
 $('vpl').onclick=()=>{if(!TOUR||TOUR.ex)return;if(TOUR.done)goTo(TOUR.focus?TOUR.i:0);else TOUR.paused=!TOUR.paused;setIcon()};
 $('vx').onclick=tourExit;
-addEventListener('keydown',e=>{if(!TOUR)return;if(e.key==='Escape')tourExit();else if(e.key==='ArrowRight')$('vnx').onclick();else if(e.key==='ArrowLeft')$('vpv').onclick();else if(e.key===' '){e.preventDefault();$('vpl').onclick()}});
+addEventListener('pointerdown',e=>{const T=TOUR;if(!T||!T.done||T.ex||!T.dt0||performance.now()-T.dt0<500)return;if(e.target.closest&&e.target.closest('#vc,#fsb'))return;tourExit()},true);
+addEventListener('keydown',e=>{if(!TOUR)return;if(TOUR.done&&!TOUR.ex&&TOUR.dt0&&performance.now()-TOUR.dt0>500&&!['Shift','Control','Alt','Meta','CapsLock'].includes(e.key)){e.preventDefault();tourExit();return}if(e.key==='Escape')tourExit();else if(e.key==='ArrowRight')$('vnx').onclick();else if(e.key==='ArrowLeft')$('vpv').onclick();else if(e.key===' '){e.preventDefault();$('vpl').onclick()}});
 // ================= FPP: creative-mode fly camera (Minecraft style) =================
 const FK={},isTouch=matchMedia('(pointer:coarse)').matches;if(isTouch)document.body.classList.add('touch');
 const FJ={on:false,id:-1,ox:0,oy:0,x:0,y:0},FL={id:-1,x:0,y:0};let fppLast=0,fppW=0,fppSprint=false,fppHint=0;
