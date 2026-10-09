@@ -19,7 +19,7 @@ canvas{display:block;touch-action:none}
 #ui button{margin:4px 4px 0 0;padding:5px 9px;border:0;border-radius:6px;background:#2a4a63;color:#fff}
 
 #ui .va{background:#1f8aa8;font-weight:700}
-#va{position:fixed;inset:0;pointer-events:none;display:none;z-index:20;--cy:#9be6f7;--tb:calc(max(44px,7vh) + env(safe-area-inset-top,0px));--bb:calc(max(60px,9vh) + env(safe-area-inset-bottom,0px))}
+#va{position:fixed;inset:0;pointer-events:none;display:none;z-index:20;--cy:#9be6f7;--tb:calc(18px + env(safe-area-inset-top,0px));--bb:calc(26px + env(safe-area-inset-bottom,0px))}
 body.tour #va{display:block}
 body.tour #ui,body.tour .l{display:none!important}
 #va .vg{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 52%,rgba(0,0,0,.6) 100%)}
@@ -90,15 +90,24 @@ body.touch #fp .tc{display:block}
 #ui b{color:#f0e6d2;letter-spacing:.12em;text-transform:uppercase}
 #ui button,#vc button{background:linear-gradient(180deg,#1e2328,#0a1428);color:#cdbe91;border:1px solid #463714;border-radius:2px;font-weight:700;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;box-shadow:inset 0 0 0 1px #010a13}
 #ui button:hover,#vc button:hover{border-color:#c8aa6e;color:#f0e6d2;background:linear-gradient(180deg,#2a2f35,#0f1d33)}
+#vh{left:10px;padding-bottom:4px;font-size:9px;letter-spacing:.1em}#vh i{width:6px;height:6px;margin:0 6px 0 0}#vh span{margin-left:10px}
+#vc{gap:6px;padding:0 8px}#vc button{min-width:30px;height:19px;padding:0 7px;font-size:10px;line-height:1;border-radius:4px}
+#vt{margin:0 4px;gap:3px}#vt b{height:4px;border-radius:2px}
+#vbox{top:calc(var(--tb) + 10px);right:3vw;width:min(340px,40vw);border-width:2px;padding:8px 12px 10px}
+#vbox .vk{font-size:14px}#vbox .vtt{font-size:11px;margin:3px 0 5px}#vbox p{font-size:11.5px;line-height:1.5}
+@media(max-width:759px),(max-aspect-ratio:10/11){#vbox{left:10px;right:10px;top:auto;bottom:calc(var(--bb) + 6px);width:auto;padding:6px 10px 8px}#vbox .vk{font-size:12px}#vbox .vtt{font-size:10px;margin:2px 0 4px}#vbox p{font-size:10.5px;line-height:1.45}#vc button{min-width:26px;padding:0 5px}}
+@media(max-height:460px) and (min-width:560px){#vbox{width:min(300px,38vw);top:calc(var(--tb) + 6px)}}
+body.rot{position:fixed;left:0;top:0;margin:0;overflow:hidden;transform-origin:0 0;transform:translateX(100vw) rotate(90deg)}
 #ui .va{background:linear-gradient(180deg,#c8aa6e,#785a28);color:#010a13;border-color:#f0e6d2}
 #ui .va:hover{background:linear-gradient(180deg,#f0e6d2,#c8aa6e);color:#010a13}
 #ui .fp{background:linear-gradient(180deg,#1e2328,#0a1428);color:#cdbe91}
 #ui button.on{border-color:#f0e6d2;color:#f0e6d2;box-shadow:inset 0 0 0 1px #c8aa6e,0 0 10px #c8aa6e88;filter:none}
 #htag{position:absolute;z-index:3;transform:translate(-50%,-100%);pointer-events:none;font-family:'Cinzel','Beaufort for LOL',Georgia,serif;font-weight:700;font-size:12px;letter-spacing:.1em;color:#f0e6d2;text-shadow:0 1px 2px #000;padding:2px 10px;background:linear-gradient(180deg,#0a1e2dcc,#010a13dd);border:1px solid #785a28;border-radius:2px;white-space:nowrap;display:none}
 #htag #hpb{display:block;height:5px;margin-top:3px;background:#010a13;border:1px solid #463714}#htag #hpf{display:block;height:100%;width:100%;background:linear-gradient(#6fe39a,#1f9a4a);transition:width .12s}
-#fsb{display:none;position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:calc(8px + env(safe-area-inset-right,0px));z-index:40;height:34px;padding:0 12px;background:linear-gradient(180deg,#1e2328,#0a1428);color:#cdbe91;border:1px solid #785a28;border-radius:2px;font:700 11.5px/1 'Cinzel','Beaufort for LOL',Georgia,serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:inset 0 0 0 1px #010a13,0 2px 8px #000a;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#fsb{display:none;position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:calc(8px + env(safe-area-inset-right,0px));z-index:40;width:34px;height:34px;padding:0;background:linear-gradient(180deg,#1e2328,#0a1428);color:#cdbe91;border:1px solid #785a28;border-radius:2px;font:700 11.5px/1 'Cinzel','Beaufort for LOL',Georgia,serif;letter-spacing:.08em;text-transform:uppercase;box-shadow:inset 0 0 0 1px #010a13,0 2px 8px #000a;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #fsb:active{border-color:#f0e6d2;color:#f0e6d2}
-@media (max-width:759px),(max-height:519px){#fsb{display:block}}
+@media (max-width:759px),(max-height:519px){#fsb{display:flex;align-items:center;justify-content:center}}
+#fsb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
 body.fpp @media (max-width:759px),(max-height:519px){}
 #mi{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(1,10,19,.84);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 #mi.on{display:flex}
@@ -115,6 +124,18 @@ body.fpp @media (max-width:759px),(max-height:519px){}
 body.sc #cre{display:block}body.sc.scon #cre{opacity:1}
 body.sc #ui,body.sc #fsb,body.sc .l,body.sc #htag{opacity:0!important;pointer-events:none!important}
 body.fpp #fsb{right:calc(64px + env(safe-area-inset-right,0px))}
+
+/* Cinematic bars: desktop +55% (18px->28px top, 26px->40px bottom). Mobile keeps the top bar and the bottom bar is 10% smaller (26px->23px), with smaller bottom controls. */
+#va{--tb:calc(28px + env(safe-area-inset-top,0px));--bb:calc(40px + env(safe-area-inset-bottom,0px))}
+#vh{padding-bottom:9px}
+@media (max-width:759px),(max-height:519px){
+#va{--tb:calc(18px + env(safe-area-inset-top,0px));--bb:calc(23px + env(safe-area-inset-bottom,0px))}
+#vh{padding-bottom:4px}
+#vc{gap:5px;padding:0 6px}
+#vc button{min-width:22px;height:15px;padding:0 4px;font-size:9px;border-radius:3px}
+#vt{margin:0 3px;gap:2px}
+#vt b{height:3px;width:clamp(6px,1.9vw,20px)}
+}
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
 <div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="tourStart()">&#9654; Visual Analysis</button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
 <button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span></div></div>
@@ -123,18 +144,21 @@ body.fpp #fsb{right:calc(64px + env(safe-area-inset-right,0px))}
 <svg id="vsv"><line id="vln" x1="0" y1="0" x2="0" y2="0"/></svg><div id="vrt"><b></b></div>
 <div id="vbox"><div class="vk"></div><div class="vtt"></div><p><span class="a"></span><span class="b"></span></p></div></div>
 <div id="fp"><div class="hint" id="fph"><b>FPP &middot; CREATIVE MODE</b><br>WASD move &middot; Mouse look &middot; Space up &middot; Shift down<br>Ctrl or double-tap W = sprint &middot; Scroll = fly speed &middot; Esc = exit</div><button class="ex" onclick="fppExit()">&#10005;</button><div class="tc"><button class="up" id="fup">&#9650;</button><button class="dn" id="fdn">&#9660;</button></div><div class="joy" id="fj"><i></i></div></div>
-<button id="fsb" onclick="togFs()" title="Full screen and landscape">Full screen</button>
-<div id="mi" role="dialog" aria-modal="true" aria-labelledby="mit"><div class="mc"><h2 id="mit">Viewing on a phone?</h2><p>The map looks best <b>full screen in landscape</b>. Tap the button below, then turn your phone sideways.</p><p class="mn">On mobile the map is drawn at a lower resolution (Optimized graphics) so it runs smoothly. You can change this any time in <b>Menu &#9656; Graphics</b>.</p><div class="mb"><button id="mif">Full screen &amp; landscape</button><button id="mic" class="g">Continue as is</button></div></div></div>
+<button id="fsb" onclick="togFs()" title="Full screen and landscape" aria-label="Full screen and landscape"></button>
+<div id="mi" role="dialog" aria-modal="true" aria-labelledby="mit"><div class="mc"><h2 id="mit">Viewing on a phone?</h2><p>The map looks best <b>full screen in landscape</b>. Tap the button below and the map switches to full screen landscape.</p><p class="mn">On mobile the map is drawn at a lower resolution (Optimized graphics) so it runs smoothly. You can change this any time in <b>Menu &#9656; Graphics</b>.</p><div class="mb"><button id="mif">Full screen &amp; landscape</button><button id="mic" class="g">Continue as is</button></div></div></div>
 <div id="cre"><b>CREATOR</b><i>tap to go back</i></div>
 <div id="ld">Loading models…</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
 if(location.protocol==='file:')document.getElementById('ld').innerHTML='Models need a web server.<br>Use GitHub Pages or run: python -m http.server';
+const ROT={on:false};const VPW=()=>ROT.on?window.innerHeight:window.innerWidth,VPH=()=>ROT.on?window.innerWidth:window.innerHeight;
+function applyRot(){const b=document.body;if(ROT.on){b.classList.add('rot');b.style.width=innerHeight+'px';b.style.height=innerWidth+'px'}else{b.classList.remove('rot');b.style.width=b.style.height=''}}
+['pointerdown','pointermove','pointerup','pointercancel','mousemove'].forEach(t=>addEventListener(t,e=>{if(!ROT.on)return;const x=e.clientX,y=e.clientY,mx=e.movementX||0,my=e.movementY||0;try{Object.defineProperty(e,'clientX',{value:y});Object.defineProperty(e,'clientY',{value:innerWidth-x});Object.defineProperty(e,'movementX',{value:my});Object.defineProperty(e,'movementY',{value:-mx})}catch(_){}},true));
 const S=new THREE.Scene();S.background=new THREE.Color(0x0e1a24);S.fog=new THREE.Fog(0x0e1a24,150,320);
-const C=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,1,600);
+const C=new THREE.PerspectiveCamera(50,VPW()/VPH(),1,600);
 try{localStorage.removeItem('gfxq')}catch(e){}
-const AAOFF=(()=>{try{return sessionStorage.getItem('gfxq')==='mobile'}catch(e){return false}})();const R=new THREE.WebGLRenderer({antialias:!AAOFF,powerPreference:'high-performance'});R.setSize(innerWidth,innerHeight);R.setPixelRatio(AAOFF?Math.min(devicePixelRatio,2):Math.min(Math.max(devicePixelRatio,1.5),2));R.outputEncoding=THREE.sRGBEncoding;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(R.domElement);
+const AAOFF=(()=>{try{return sessionStorage.getItem('gfxq')==='mobile'}catch(e){return false}})();const R=new THREE.WebGLRenderer({antialias:!AAOFF,powerPreference:'high-performance'});R.setSize(VPW(),VPH());R.setPixelRatio(AAOFF?Math.min(devicePixelRatio,2):Math.min(Math.max(devicePixelRatio,1.5),2));R.outputEncoding=THREE.sRGBEncoding;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;document.body.appendChild(R.domElement);
 const HL=new THREE.HemisphereLight(0xdfe9ff,0x2c3a2c,0.5);S.add(HL);
 const sun=new THREE.DirectionalLight(0xfff2de,1.15);sun.position.set(-55,72,38);sun.castShadow=true;
 {const sm=Math.min(4096,R.capabilities.maxTextureSize),sc=sun.shadow.camera;sun.shadow.mapSize.set(sm,sm);sc.left=-78;sc.right=78;sc.top=78;sc.bottom=-78;sc.near=10;sc.far=220;sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.06;sun.shadow.radius=2.5}
@@ -723,7 +747,7 @@ el.onpointermove=e=>{if(TOUR||FPP)return;const o=pts.get(e.pointerId);if(!o)retu
  pts.set(e.pointerId,[e.clientX,e.clientY]);
  if(pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pd)rad=Math.max(30,Math.min(260,rad*pd/d));pd=d}};
 el.onwheel=e=>{e.preventDefault();if(TOUR)return;if(FPP){fppSpd=Math.max(.2,Math.min(5,fppSpd*(1-Math.sign(e.deltaY)*.12)));return}rad=Math.max(30,Math.min(260,rad*(1+e.deltaY*0.001)))};
-onresize=()=>{C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix();R.setSize(innerWidth,innerHeight)};
+onresize=()=>{if(ROT.on&&window.innerWidth>window.innerHeight)ROT.on=false;applyRot();C.aspect=VPW()/VPH();C.updateProjectionMatrix();R.setSize(VPW(),VPH())};
 
 // ================= VISUAL ANALYSIS: cinematic drone tour =================
 let TOUR=null;
@@ -814,7 +838,7 @@ function tourUI(){const T=TOUR;if(!T)return;$('valt').textContent='ALT '+Math.ma
  const st=STS[T.i],tot=st.fl+st.dw,t0=st.fl*.55,vis=T.s>t0&&(T.s<tot-.6||T.done);bx.classList.toggle('on',vis);
  const n=Math.max(0,Math.min(st.tx.length,Math.floor((T.s-t0)*46))),key=T.i+':'+n;
  if(key!==T.key){T.key=key;const p=bx.querySelector('p');p.children[0].textContent=st.tx.slice(0,n);p.children[1].textContent=st.tx.slice(n)}
- let show=false,x=0,y=0;if(vis&&st.pt&&T.s>st.fl*.85){_pt.set(...st.pt).project(C);if(_pt.z<1&&Math.abs(_pt.x)<1&&Math.abs(_pt.y)<1){show=true;x=(_pt.x*.5+.5)*innerWidth;y=(-_pt.y*.5+.5)*innerHeight}}
+ let show=false,x=0,y=0;if(vis&&st.pt&&T.s>st.fl*.85){_pt.set(...st.pt).project(C);if(_pt.z<1&&Math.abs(_pt.x)<1&&Math.abs(_pt.y)<1){show=true;x=(_pt.x*.5+.5)*VPW();y=(-_pt.y*.5+.5)*VPH()}}
  rt.classList.toggle('on',show);ln.style.opacity=show?1:0;
  if(show){rt.style.transform='translate('+x+'px,'+y+'px)';const r=bx.getBoundingClientRect(),nr=NARROW(),ax=nr?r.left+r.width/2:r.left,ay=nr?r.top:r.bottom,dx=x-ax,dy=y-ay,d=Math.hypot(dx,dy)||1,k=Math.max(0,d-24)/d;
   ln.setAttribute('x1',ax);ln.setAttribute('y1',ay);ln.setAttribute('x2',ax+dx*k);ln.setAttribute('y2',ay+dy*k)}}
@@ -826,7 +850,7 @@ function labelFocus(i){if(TOUR||FPP||$('ld'))return;
  document.body.classList.add('tour');goTo(i);requestAnimationFrame(()=>requestAnimationFrame(()=>$('va').classList.add('on')))}
 // label placement: project to the screen, then hide any label that would overlap a higher-priority one
 const _lp=new THREE.Vector3();
-function labTick(){if(!lab||TOUR||FPP)return;const W=innerWidth,H=innerHeight,box=[];
+function labTick(){if(!lab||TOUR||FPP)return;const W=VPW(),H=VPH(),box=[];
  for(const l of labs){if(l.stp&&!l.ok&&STP[l.stp]){const q=STP[l.stp];l.v.set(q.x,q.y+9,q.z);l.st.t=[q.x,q.y+5,q.z];l.st.pt=[q.x,q.y+4.4,q.z];l.ok=1}
   if(l.dyn!==undefined&&CRABS[l.dyn]){const q=CRABS[l.dyn].m.position;l.v.set(q.x,2.6,q.z)}}
  for(const l of LSORT){_lp.copy(l.v).project(C);const x=(_lp.x*.5+.5)*W,y=(-_lp.y*.5+.5)*H;let show=_lp.z<1&&_lp.x>-1&&_lp.x<1&&_lp.y>-1&&_lp.y<1;
@@ -856,7 +880,7 @@ addEventListener('keyup',e=>{FK[e.code]=false;if(e.code==='KeyW')fppSprint=false
 addEventListener('blur',()=>{for(const k in FK)FK[k]=false});
 // touch: left half = move stick, right half = look
 el.addEventListener('pointerdown',e=>{if(!FPP||e.pointerType==='mouse')return;el.setPointerCapture(e.pointerId);
- if(e.clientX<innerWidth/2&&!FJ.on){FJ.on=true;FJ.id=e.pointerId;FJ.ox=e.clientX;FJ.oy=e.clientY;FJ.x=FJ.y=0;const j=$('fj');j.style.display='block';j.style.left=e.clientX+'px';j.style.top=e.clientY+'px'}
+ if(e.clientX<VPW()/2&&!FJ.on){FJ.on=true;FJ.id=e.pointerId;FJ.ox=e.clientX;FJ.oy=e.clientY;FJ.x=FJ.y=0;const j=$('fj');j.style.display='block';j.style.left=e.clientX+'px';j.style.top=e.clientY+'px'}
  else if(FL.id<0){FL.id=e.pointerId;FL.x=e.clientX;FL.y=e.clientY}});
 el.addEventListener('pointermove',e=>{if(!FPP||e.pointerType==='mouse')return;
  if(e.pointerId===FJ.id){let dx=e.clientX-FJ.ox,dy=e.clientY-FJ.oy;const d=Math.hypot(dx,dy),m=50;if(d>m){dx*=m/d;dy*=m/d}FJ.x=dx/m;FJ.y=dy/m;$('fj').firstChild.style.transform='translate('+dx+'px,'+dy+'px)'}
@@ -904,7 +928,7 @@ function tppStart(){if(FPP||TOUR||$('ld'))return;heroLoad(()=>{if(FPP)return;
  HERO.m.visible=true;HERO.m.position.set(FPP.x,0,FPP.z);C.near=1;C.fov=45;C.updateProjectionMatrix();C.rotation.order='YXZ';
  document.body.classList.add('fpp');$('fph').innerHTML='<b>TPP &middot; MOBA VIEW</b><br>WASD or right-click = move &middot; Shift = sprint &middot; Scroll = zoom &middot; Esc = exit';$('fph').style.opacity=1;fppHint=performance.now()+6000;fppLast=performance.now();let tg=document.getElementById('htag');if(!tg){tg=document.createElement('div');tg.id='htag';tg.innerHTML='FLOAT-9<span id="hpb"><i id="hpf"></i></span>';document.body.appendChild(tg)}tg.style.display='block'})}
 const tppRay=new THREE.Raycaster(),tppPl=new THREE.Plane(new V3(0,1,0),0),tppP=new V3();
-el.addEventListener('pointerdown',e=>{if(!FPP||!FPP.tp||e.pointerType!=='mouse')return;tppRay.setFromCamera({x:e.clientX/innerWidth*2-1,y:-(e.clientY/innerHeight)*2+1},C);if(tppRay.ray.intersectPlane(tppPl,tppP))FPP.dest=[tppP.x,tppP.z]});
+el.addEventListener('pointerdown',e=>{if(!FPP||!FPP.tp||e.pointerType!=='mouse')return;tppRay.setFromCamera({x:e.clientX/VPW()*2-1,y:-(e.clientY/VPH())*2+1},C);if(tppRay.ray.intersectPlane(tppPl,tppP))FPP.dest=[tppP.x,tppP.z]});
 el.addEventListener('contextmenu',e=>{if(FPP&&FPP.tp)e.preventDefault()});
 addEventListener('wheel',e=>{if(FPP&&FPP.tp)FPP.dist=Math.max(14,Math.min(42,FPP.dist+e.deltaY*.02))},{passive:true});
 // ---------- Red towers attack the hero when they can see him (in range and not hidden in a bush) ----------
@@ -949,7 +973,7 @@ function tppTick(dt){const F=FPP;F.yaw=HERO.yaw;F.pitch=HERO.pitch;tppGround(F,d
  for(let i=0;i<HERO.seed.length;i++){const p=HERO.seed[i];p.y-=dt*p.s*1.4;if(p.y<.05){p.y=fy-.3;p.a=Math.random()*6.28;p.r=.12+Math.random()*.32}HERO.pa[i*3]=Math.cos(p.a)*p.r*(1+(1-p.y/(fy+.1))*.5);HERO.pa[i*3+1]=p.y;HERO.pa[i*3+2]=Math.sin(p.a)*p.r*(1+(1-p.y/(fy+.1))*.5)}HERO.pg.attributes.position.needsUpdate=true;
  tppCombat(dt,F,fy+F.gy);const inB=tppIn(F.x,F.z);F.hid+=((inB?1:0)-F.hid)*Math.min(1,dt*6);const al=1-.7*F.hid,ef=1-.92*F.hid;
  HERO.mats.forEach(x=>{x.opacity=al});HERO.sh.material.opacity=.35*ef;HERO.r1.material.opacity=.7*ef;HERO.r2.material.opacity=.8*ef;HERO.col.material.opacity=(.13+.05*Math.sin(t*4))*ef;HERO.pts.material.opacity=.8*ef;
- {const tg=document.getElementById('htag');if(tg){const v=new V3(F.x,fy+F.gy+HERO.h+.45,F.z).project(C);if(v.z>1)tg.style.display='none';else{tg.style.display=F.dead>0?'none':'block';tg.style.left=((v.x+1)/2*innerWidth)+'px';tg.style.top=((1-v.y)/2*innerHeight)+'px';tg.style.opacity=1-.75*F.hid;const hf=document.getElementById('hpf');if(hf){hf.style.width=F.hp+'%';hf.style.background=F.hp<35?'linear-gradient(#ff7a6a,#c0392b)':'linear-gradient(#6fe39a,#1f9a4a)'}}}}
+ {const tg=document.getElementById('htag');if(tg){const v=new V3(F.x,fy+F.gy+HERO.h+.45,F.z).project(C);if(v.z>1)tg.style.display='none';else{tg.style.display=F.dead>0?'none':'block';tg.style.left=((v.x+1)/2*VPW())+'px';tg.style.top=((1-v.y)/2*VPH())+'px';tg.style.opacity=1-.75*F.hid;const hf=document.getElementById('hpf');if(hf){hf.style.width=F.hp+'%';hf.style.background=F.hp<35?'linear-gradient(#ff7a6a,#c0392b)':'linear-gradient(#6fe39a,#1f9a4a)'}}}}
  const cp=Math.cos(F.pitch),d=F.dist;C.position.set(F.x+Math.sin(F.yaw)*cp*d,Math.sin(F.pitch)*d+.5+F.gy,F.z+Math.cos(F.yaw)*cp*d);C.lookAt(F.x,.7+F.gy,F.z);
  if(performance.now()>fppHint)$('fph').style.opacity=0}
 // ---------- graphics quality: High (default) / Optimized / Mobile ----------
@@ -975,7 +999,7 @@ function gfxTex(max){const seen=new Set();S.traverse(o=>{if(!o.material)return;(
  t.image=tg;t.needsUpdate=true})})})}
 function gfxFresh(c){gfxThin(c);gfxTex(c.tx);try{EM.forEach(s=>s.visible=GQ!=='mobile')}catch(e){}S.traverse(o=>{if(o.isPointLight)o.visible=!!c.lt;if(o.isPoints&&o.geometry.attributes.position){if(o.userData.n0===undefined)o.userData.n0=o.geometry.attributes.position.count;o.visible=c.pt>0;o.geometry.setDrawRange(0,Math.ceil(o.userData.n0*c.pt))}})}
 function applyGfx(k){const c=GFX[k];if(!c)return;GQ=k;GQF=c.fps;
- R.setPixelRatio(Math.min(Math.max(devicePixelRatio,c.pm||0),c.pr));R.setSize(innerWidth,innerHeight);
+ R.setPixelRatio(Math.min(Math.max(devicePixelRatio,c.pm||0),c.pr));R.setSize(VPW(),VPH());
  R.shadowMap.enabled=!!c.sh;R.shadowMap.autoUpdate=!(c.su>1);R.shadowMap.needsUpdate=true;GQA.pr=c.pr;GQA.s=GQA.c=GQA.l=0;R.shadowMap.type=c.soft?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;sun.castShadow=!!c.sh;
  const m=Math.min(c.sm,R.capabilities.maxTextureSize);if(sun.shadow.mapSize.x!==m){sun.shadow.mapSize.set(m,m);if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}}
  gfxFresh(c);
@@ -984,7 +1008,7 @@ function applyGfx(k){const c=GFX[k];if(!c)return;GQ=k;GQF=c.fps;
 function pickGfx(k){let ok=false;try{sessionStorage.setItem('gfxq',k);ok=sessionStorage.getItem('gfxq')===k}catch(e){}if(ok&&(k==='mobile')!==AAOFF){location.reload();return}applyGfx(k)}
 function togGfx(){const o=document.getElementById('gx').classList.toggle('open');const b=document.getElementById('gb');b.classList.toggle('on',o);b.innerHTML='Graphics '+(o?'&#9662;':'&#9656;')}
 // default: High; small screens (phones, narrow windows) start on Optimized unless a choice was already made in this tab
-try{const sm=innerWidth<760||innerHeight<520;let sv=null;try{sv=sessionStorage.getItem('gfxq')}catch(e){}const q=GFX[sv]?sv:(sm?'optimized':'high');if(q!=='high')applyGfx(q)}catch(e){}
+try{const sm=VPW()<760||VPH()<520;let sv=null;try{sv=sessionStorage.getItem('gfxq')}catch(e){}const q=GFX[sv]?sv:(sm?'optimized':'high');if(q!=='high')applyGfx(q)}catch(e){}
 setInterval(()=>{if(GQ==='high')gfxThin(GFX.high);else gfxFresh(GFX[GQ])},1000);
 // ---------- carved, glowing credit letters on one side face of the map slab (z=-55, the side along the Red team's top lane) ----------
 // side faces are at +-55 and span y -2.3..-0.1; a baked canvas (chiselled rim + inner shadow/highlight) is laid over them and a second additive plane makes the letters glow
@@ -1077,7 +1101,7 @@ function scTick(){const n=performance.now(),S0=SCN;
  C.position.copy(scP);C.lookAt(scL)}
 // moon hit test: single tap/click without dragging, night sky only
 (function(){const el2=R.domElement,pd=new Map(),tv=new V3();
- const moonAt=(x,y)=>{if(SKYU.uNight.value<.5)return false;C.updateMatrixWorld();tv.set(x/innerWidth*2-1,-(y/innerHeight)*2+1,.5).unproject(C).sub(C.position).normalize();return tv.angleTo(SKYU.uMoon.value)<.085};
+ const moonAt=(x,y)=>{if(SKYU.uNight.value<.5)return false;C.updateMatrixWorld();tv.set(x/VPW()*2-1,-(y/VPH())*2+1,.5).unproject(C).sub(C.position).normalize();return tv.angleTo(SKYU.uMoon.value)<.085};
  el2.addEventListener('pointerdown',e=>{pd.set(e.pointerId,{x:e.clientX,y:e.clientY,t:performance.now(),multi:pd.size>0});if(pd.size>1)pd.forEach(v=>v.multi=true)});
  const up=e=>{const p=pd.get(e.pointerId);pd.delete(e.pointerId);if(!p||p.multi||e.type==='pointercancel')return;
   if(Math.hypot(e.clientX-p.x,e.clientY-p.y)>8||performance.now()-p.t>600)return;
@@ -1087,20 +1111,23 @@ function scTick(){const n=performance.now(),S0=SCN;
  setTimeout(()=>{if(GQ!=='mobile')loadHero2()},6000)})();
 // ---------- full screen + landscape (button shows on small screens only; see #fsb in the CSS) ----------
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
-function fsLabel(){const b=document.getElementById('fsb');if(b&&!b.dataset.t)b.textContent=fsEl()?'Exit full screen':'Full screen'}
-function fsNote(t){const b=document.getElementById('fsb');b.dataset.t=1;b.textContent=t;setTimeout(()=>{delete b.dataset.t;fsLabel()},3500)}
-async function togFs(){const d=document.documentElement,so=screen.orientation;
- if(fsEl()){try{so&&so.unlock&&so.unlock()}catch(e){}try{await(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}fsLabel();return}
- let ok=false;try{const rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq){await rq.call(d);ok=true}}catch(e){}
- let rot=false;try{if(so&&so.lock){await so.lock('landscape');rot=true}}catch(e){}
- fsLabel();if(!ok&&!rot)fsNote('Rotate your phone');else if(ok&&!rot&&innerHeight>innerWidth)fsNote('Rotate your phone')}
+const FSI='<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',FXI='<svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
+function fsLabel(){const b=document.getElementById('fsb');if(!b)return;const f=!!fsEl()||ROT.on;b.innerHTML=f?FXI:FSI;b.title=b.ariaLabel=f?'Exit full screen':'Full screen and landscape'}
+function setRot(on){ROT.on=on;applyRot();onresize&&onresize();fsLabel()}
+function togFs(){const d=document.documentElement,so=screen.orientation;
+ if(fsEl()||ROT.on){try{so&&so.unlock&&so.unlock()}catch(e){}if(ROT.on)setRot(false);if(fsEl())try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(e){}fsLabel();return}
+ let p=null;try{const rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq)p=rq.call(d)}catch(e){}
+ const lk=()=>{try{return so&&so.lock?so.lock('landscape'):Promise.reject()}catch(e){return Promise.reject(e)}};
+ const fb=()=>setTimeout(()=>{if(window.innerHeight>window.innerWidth)setRot(true);fsLabel()},250);
+ Promise.resolve(p).catch(()=>{}).then(lk).then(()=>setTimeout(()=>{if(window.innerHeight>window.innerWidth)setRot(true);fsLabel()},700),fb);fsLabel()}
 ['fullscreenchange','webkitfullscreenchange'].forEach(n=>document.addEventListener(n,()=>{if(!fsEl()){try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock()}catch(e){}}fsLabel()}));
+fsLabel();
 // ---------- first-visit prompt on small screens: ask for full screen + landscape and explain the lower resolution ----------
 (function(){const mi=document.getElementById('mi');let seen=false;try{seen=sessionStorage.getItem('riftIntro')==='1'}catch(e){}
- if(seen||!(innerWidth<760||innerHeight<520))return;mi.classList.add('on');
+ if(seen||!(VPW()<760||VPH()<520))return;mi.classList.add('on');
  const done=()=>{mi.classList.remove('on');try{sessionStorage.setItem('riftIntro','1')}catch(e){}};
  document.getElementById('mif').onclick=()=>{done();togFs()};document.getElementById('mic').onclick=done})();
-(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(innerWidth,innerHeight)}}}
+(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(VPW(),VPH())}}}
  labTick();
  if(TOUR)tourUI();requestAnimationFrame(loop)})();
 </script></body></html>
