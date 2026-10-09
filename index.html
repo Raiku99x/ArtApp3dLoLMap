@@ -50,7 +50,7 @@ body.tour #ui,body.tour .l{display:none!important}
 #vbox .vtt{font-size:14px;margin:4px 0 8px;color:#fff}
 #vbox p{margin:0;font-size:14.5px;line-height:1.6;letter-spacing:.01em}
 #vbox .b{color:transparent;text-shadow:none}
-@media(max-width:759px),(max-aspect-ratio:10/11){#vbox{left:12px;right:12px;top:auto;bottom:calc(var(--bb) + 10px);width:auto;padding:9px 12px 11px}#vbox .vk{font-size:15px}#vbox .vtt{font-size:12px}#vbox p{font-size:12.5px;line-height:1.5}#vh span{display:none}#vc button{min-width:34px;padding:0 7px}}
+@media(max-width:759px),(max-aspect-ratio:10/11){#vh span{display:none}#vc button{min-width:34px;padding:0 7px}}
 #ui .fp{background:#3f9a54;font-weight:700}
 #ui button{transition:box-shadow .22s ease,transform .12s ease,filter .22s ease}
 #ui button:active{transform:scale(.94)}
@@ -95,8 +95,7 @@ body.touch #fp .tc{display:block}
 #vt{margin:0 4px;gap:3px}#vt b{height:4px;border-radius:2px}
 #vbox{top:calc(var(--tb) + 10px);right:3vw;width:min(340px,40vw);border-width:2px;padding:8px 12px 10px}
 #vbox .vk{font-size:14px}#vbox .vtt{font-size:11px;margin:3px 0 5px}#vbox p{font-size:11.5px;line-height:1.5}
-@media(max-width:759px),(max-aspect-ratio:10/11){#vbox{left:10px;right:10px;top:auto;bottom:calc(var(--bb) + 6px);width:auto;padding:6px 10px 8px}#vbox .vk{font-size:12px}#vbox .vtt{font-size:10px;margin:2px 0 4px}#vbox p{font-size:10.5px;line-height:1.45}#vc button{min-width:26px;padding:0 5px}}
-@media(max-height:460px) and (min-width:560px){#vbox{width:min(300px,38vw);top:calc(var(--tb) + 6px)}}
+@media(max-width:759px),(max-aspect-ratio:10/11){#vc button{min-width:26px;padding:0 5px}}
 body.rot{position:fixed;left:0;top:0;margin:0;overflow:hidden;transform-origin:0 0;transform:translateX(100vw) rotate(90deg)}
 #ui .va{background:linear-gradient(180deg,#c8aa6e,#785a28);color:#010a13;border-color:#f0e6d2}
 #ui .va:hover{background:linear-gradient(180deg,#f0e6d2,#c8aa6e);color:#010a13}
@@ -135,6 +134,16 @@ body.fpp #fsb{right:calc(64px + env(safe-area-inset-right,0px))}
 #vc button{min-width:22px;height:15px;padding:0 4px;font-size:9px;border-radius:3px}
 #vt{margin:0 3px;gap:2px}
 #vt b{height:3px;width:clamp(6px,1.9vw,20px)}
+}
+
+/* Visual Analysis caption box: JS toggles #va.nr (bottom strip) from the real screen size, also when the page is rotated */
+#va.nr #vbox{left:10px;right:10px;top:auto;bottom:calc(var(--bb) + 6px);width:auto;padding:6px 10px 8px}
+#va.nr #vbox .vk{font-size:12px}#va.nr #vbox .vtt{font-size:10px;margin:2px 0 4px}#va.nr #vbox p{font-size:10.5px;line-height:1.45}
+#va:not(.nr) #vbox{left:auto;bottom:auto}
+@media(max-height:520px){
+#va:not(.nr) #vbox{right:max(3vw,10px);top:calc(var(--tb) + 8px);width:min(280px,38vw);max-height:calc(100% - var(--tb) - var(--bb) - 16px);overflow:hidden;padding:6px 10px 8px;border-width:2px}
+#va:not(.nr) #vbox .vk{font-size:12px}#va:not(.nr) #vbox .vtt{font-size:10px;margin:2px 0 4px}#va:not(.nr) #vbox p{font-size:10.5px;line-height:1.4}
+#vrt{width:34px;height:34px;margin:-17px 0 0 -17px}
 }
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
 <div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="tourStart()">&#9654; Visual Analysis</button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
@@ -751,7 +760,7 @@ onresize=()=>{if(ROT.on&&window.innerWidth>window.innerHeight)ROT.on=false;apply
 
 // ================= VISUAL ANALYSIS: cinematic drone tour =================
 let TOUR=null;
-const V3=THREE.Vector3,UP=new V3(0,1,0),$=id=>document.getElementById(id),NARROW=()=>matchMedia('(max-width:759px),(max-aspect-ratio:10/11)').matches;
+const V3=THREE.Vector3,UP=new V3(0,1,0),$=id=>document.getElementById(id),NARROW=()=>{const w=VPW(),h=VPH();return w/h<=10/11||(w<=759&&h>460)};
 // t = look target, r = distance, el = elevation(deg), a = azimuth(deg), de/da = elevation/azimuth drift, z = dolly (+out / -in), pt = world point the reticle locks on
 // free stops use P/P1 (camera start/end) and L/L1 (look start/end)
 const TD=[
@@ -833,14 +842,14 @@ function tourTick(){const T=TOUR,now=performance.now(),dt=Math.min(.05,(now-T.la
  C.position.copy(P);C.lookAt(L);T.look.copy(L);if(Math.abs(C.fov-fov)>.01){C.fov=fov;C.updateProjectionMatrix()}
  FM=st.fm||1;FXK+=(((!T.ex&&st.fx)?1:0)-FXK)*Math.min(1,dt*2.5);FX.visible=FXK>.02;const pu=.75+.25*Math.sin(tm*3);FXM.forEach(m=>m.opacity=.6*FXK*pu)}
 const _pt=new V3();
-function tourUI(){const T=TOUR;if(!T)return;$('valt').textContent='ALT '+Math.max(0,Math.round(C.position.y*1.2))+' m';
+function tourUI(){const T=TOUR;if(!T)return;$('va').classList.toggle('nr',NARROW());$('valt').textContent='ALT '+Math.max(0,Math.round(C.position.y*1.2))+' m';
  const bx=$('vbox'),rt=$('vrt'),ln=$('vln');if(T.ex){bx.classList.remove('on');rt.classList.remove('on');ln.style.opacity=0;return}
  const st=STS[T.i],tot=st.fl+st.dw,t0=st.fl*.55,vis=T.s>t0&&(T.s<tot-.6||T.done);bx.classList.toggle('on',vis);
  const n=Math.max(0,Math.min(st.tx.length,Math.floor((T.s-t0)*46))),key=T.i+':'+n;
  if(key!==T.key){T.key=key;const p=bx.querySelector('p');p.children[0].textContent=st.tx.slice(0,n);p.children[1].textContent=st.tx.slice(n)}
- let show=false,x=0,y=0;if(vis&&st.pt&&T.s>st.fl*.85){_pt.set(...st.pt).project(C);if(_pt.z<1&&Math.abs(_pt.x)<1&&Math.abs(_pt.y)<1){show=true;x=(_pt.x*.5+.5)*VPW();y=(-_pt.y*.5+.5)*VPH()}}
+ let show=false,x=0,y=0;if(vis&&st.pt&&T.s>st.fl*.85){_pt.set(...st.pt).project(C);if(_pt.z<1&&Math.abs(_pt.x)<1&&Math.abs(_pt.y)<1){x=(_pt.x*.5+.5)*VPW();y=(-_pt.y*.5+.5)*VPH();const tbH=$('va').querySelector('.lb.t').offsetHeight,bbH=$('va').querySelector('.lb.b').offsetHeight;show=y>tbH+10&&y<VPH()-bbH-10}}
  rt.classList.toggle('on',show);ln.style.opacity=show?1:0;
- if(show){rt.style.transform='translate('+x+'px,'+y+'px)';const r=bx.getBoundingClientRect(),nr=NARROW(),ax=nr?r.left+r.width/2:r.left,ay=nr?r.top:r.bottom,dx=x-ax,dy=y-ay,d=Math.hypot(dx,dy)||1,k=Math.max(0,d-24)/d;
+ if(show){rt.style.transform='translate('+x+'px,'+y+'px)';let r=bx.getBoundingClientRect();if(ROT.on){const W=innerWidth;r={left:r.top,right:r.bottom,top:W-r.right,bottom:W-r.left,width:r.height,height:r.width}}const nr=NARROW(),ax=nr?r.left+r.width/2:r.left,ay=nr?r.top:r.bottom,dx=x-ax,dy=y-ay,d=Math.hypot(dx,dy)||1,k=Math.max(0,d-24)/d;
   ln.setAttribute('x1',ax);ln.setAttribute('y1',ay);ln.setAttribute('x2',ax+dx*k);ln.setAttribute('y2',ay+dy*k)}}
 // click a label: fly to it with the same callout as the Visual Analysis tour (ring, line, caption box, progress ticks)
 function labelFocus(i){if(TOUR||FPP||$('ld'))return;
