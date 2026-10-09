@@ -151,6 +151,14 @@ body.fpp #fsb{right:calc(64px + env(safe-area-inset-right,0px))}
 #va.dn #vhint{opacity:1;animation:vhp 1.6s ease-in-out infinite}
 @keyframes vhp{50%{opacity:.45}}
 @media(min-width:760px) and (min-height:521px){#vhint{font-size:11px}}
+
+/* hidden river statue showcase */
+#egl i{position:fixed;left:0;right:0;height:0;background:#000;z-index:34;pointer-events:none;transition:height 1.1s ease}
+#egl i:first-child{top:0}#egl i:last-child{bottom:0}
+body.eg #egl i{height:9vh}
+#egt{position:fixed;left:0;right:0;top:50%;text-align:center;z-index:36;pointer-events:none;opacity:0;transition:opacity .4s;font:700 12px/1 'Cinzel',Georgia,serif;letter-spacing:.34em;color:#f0e6d2;text-shadow:0 0 12px #c8aa6e,0 1px 3px #000}
+body.egw #egt{opacity:.85}
+body.eg #ui,body.eg #fsb,body.eg .l,body.eg #htag,body.eg #fp{opacity:0!important;pointer-events:none!important}
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
 <div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="tourStart()">&#9654; Visual Analysis</button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
 <button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span></div></div>
@@ -162,7 +170,7 @@ body.fpp #fsb{right:calc(64px + env(safe-area-inset-right,0px))}
 <button id="fsb" onclick="togFs()" title="Full screen and landscape" aria-label="Full screen and landscape"></button>
 <div id="mi" role="dialog" aria-modal="true" aria-labelledby="mit"><div class="mc"><h2 id="mit">Viewing on a phone?</h2><p>The map looks best <b>full screen in landscape</b>. Tap the button below and the map switches to full screen landscape.</p><p class="mn">On mobile the map is drawn at a lower resolution (Optimized graphics) so it runs smoothly. You can change this any time in <b>Menu &#9656; Graphics</b>.</p><div class="mb"><button id="mif">Full screen &amp; landscape</button><button id="mic" class="g">Continue as is</button></div></div></div>
 <div id="cre"><b>CREATOR</b><i>tap to go back</i></div>
-<div id="ld">Loading models…</div>
+<div id="egl"><i></i><i></i></div><div id="egt">SOMETHING STIRS&hellip;</div><div id="ld">Loading models…</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
@@ -319,7 +327,7 @@ function rockFx(m){// original rock colour + mossy tops/base and a cool rim glow
    outgoingLight+=vec3(.02,.05,.04)*moss*(.5+.5*sin(uT*.6+vH*3.+vN.z*2.))*.6;
    gl_FragColor = vec4( outgoingLight, diffuseColor.a );`)}}
 function inst(n,list,sc,yb,y0,tint){if(!MD[n]||!list.length)return;const lm=LM(n,tint);if(/^(rock|spire)/.test(n)&&!tint)rockFx(lm);const im=new THREE.InstancedMesh(MD[n].g,lm,list.length),o=new THREE.Object3D();
- list.forEach((c,i)=>{const s=sc*(.8+rnd()*.5);o.position.set(c[0]+(rnd()-.5)*.5,y0===undefined?-.1:y0,c[1]+(rnd()-.5)*.5);o.rotation.set(0,rnd()*6.28,0);o.scale.set(s,s*(yb+rnd()*.5),s);o.updateMatrix();im.setMatrixAt(i,o.matrix)});S.add(im)}
+ list.forEach((c,i)=>{const s=sc*(.8+rnd()*.5);o.position.set(c[0]+(rnd()-.5)*.5,y0===undefined?-.1:y0,c[1]+(rnd()-.5)*.5);o.rotation.set(0,rnd()*6.28,0);o.scale.set(s,s*(yb+rnd()*.5),s);o.updateMatrix();im.setMatrixAt(i,o.matrix)});S.add(im);return im}
 // brush spots read off the real map (pixel x,y in the reference image crop 1232x980, radius in map units); mirrored for the other half
 const BP0=[];
 const BP=[];BP0.forEach(([px,py,r])=>{const x=px/1232*105-52.5,z=py/980*105-52.5;BP.push([x,z,r]);BP.push([-x,-z,r])});
@@ -346,7 +354,7 @@ const MIDP=(function(){const u=[.7071,-.7071],n=[.7071,.7071],bush=[],rock=[];
   [-1,1].forEach(e=>{const wx=cx+u[0]*e*4.4,wz=cz+u[1]*e*4.4;
    for(let t=-4;t<=4;t+=1.15)[0,e*1.1].forEach(o=>rock.push([wx+n[0]*t+u[0]*o,wz+n[1]*t+u[1]*o]))})});
  return{bush,rock}})();
-function buildMidWalls(){const A=[],B=[];MIDP.rock.forEach((p,i)=>(i%2?A:B).push(p));inst('rock_a',A,.95,1.0,-.07,new THREE.Color(1.9,1.25,.8));inst('rock_b',B,.95,1.1,-.07,new THREE.Color(1.9,1.25,.8))}
+function buildMidWalls(){const A=[],B=[];MIDP.rock.forEach((p,i)=>(i%2?A:B).push(p));const iaR=inst('rock_a',A,.95,1.0,-.07,new THREE.Color(1.9,1.25,.8));const ibR=inst('rock_b',B,.95,1.1,-.07,new THREE.Color(1.9,1.25,.8));eggRocks(iaR,ibR)}
 function buildBushes(){// bushes on the real brush spots; any wall rock underneath is removed
  const BS=new Set();let L=[];
  WCELLS.forEach(c=>{if(inBush(c[0],c[1]))BS.add(c)});
@@ -755,13 +763,13 @@ function viewMark(){let k='';for(const n in VW){const v=VW[n];if((v[0]===null||M
  if(lab!==vwLab){vwLab=lab;document.getElementById('lbb').classList.toggle('on',lab)}}
 function cam(){if(SCN){scTick();return}C.position.set(rad*Math.sin(ph)*Math.sin(th),rad*Math.cos(ph),rad*Math.sin(ph)*Math.cos(th));C.lookAt(0,0,0)}
 const el=R.domElement;let pts=new Map(),pd=0;
-el.onpointerdown=e=>{if(TOUR||FPP)return;el.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY])};
+el.onpointerdown=e=>{if(TOUR||FPP||EGG)return;el.setPointerCapture(e.pointerId);pts.set(e.pointerId,[e.clientX,e.clientY])};
 el.onpointerup=el.onpointercancel=e=>{pts.delete(e.pointerId);pd=0};
-el.onpointermove=e=>{if(TOUR||FPP)return;const o=pts.get(e.pointerId);if(!o)return;
+el.onpointermove=e=>{if(TOUR||FPP||EGG)return;const o=pts.get(e.pointerId);if(!o)return;
  if(pts.size===1){th-=(e.clientX-o[0])*0.006;ph=Math.max(0.01,Math.min(1.5,ph-(e.clientY-o[1])*0.006))}
  pts.set(e.pointerId,[e.clientX,e.clientY]);
  if(pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pd)rad=Math.max(30,Math.min(260,rad*pd/d));pd=d}};
-el.onwheel=e=>{e.preventDefault();if(TOUR)return;if(FPP){fppSpd=Math.max(.2,Math.min(5,fppSpd*(1-Math.sign(e.deltaY)*.12)));return}rad=Math.max(30,Math.min(260,rad*(1+e.deltaY*0.001)))};
+el.onwheel=e=>{e.preventDefault();if(TOUR||EGG)return;if(FPP){fppSpd=Math.max(.2,Math.min(5,fppSpd*(1-Math.sign(e.deltaY)*.12)));return}rad=Math.max(30,Math.min(260,rad*(1+e.deltaY*0.001)))};
 onresize=()=>{if(ROT.on&&window.innerWidth>window.innerHeight)ROT.on=false;applyRot();C.aspect=VPW()/VPH();C.updateProjectionMatrix();R.setSize(VPW(),VPH())};
 
 // ================= VISUAL ANALYSIS: cinematic drone tour =================
@@ -1104,7 +1112,7 @@ function scPath(P0,P2,u,o){const R=130,az0=Math.atan2(P0.x,P0.z),ay=Math.max(P0.
  if(u<s2){const k=(u-s1)/(s2-s1),az=az0+d*k;return o.set(R*Math.sin(az),ay+(-8-ay)*k,R*Math.cos(az))}
  const k=(u-s2)/(1-s2);return o.set(P2.x*k,-8+(P2.y+8)*k,R+(P2.z-R)*k)}
 function scOrbit(e,o){const a=.55*Math.sin(e*.16);return o.set(Math.sin(a)*HC.R,HC.y,Math.cos(a)*HC.R)}
-function scStart(){if(SCN||TOUR||FPP)return;const d=new V3();C.getWorldDirection(d);
+function scStart(){if(SCN||TOUR||FPP||EGG)return;const d=new V3();C.getWorldDirection(d);
  SCN={t0:performance.now(),P0:C.position.clone(),L0:C.position.clone().addScaledVector(d,60),sv:{th,ph,rad,fov:C.fov},out:0,arr:0};
  document.body.classList.add('sc');loadHero2().then(h=>{if(h&&SCN){h.W.visible=true;h.L.visible=true}})}
 function scExit(){if(!SCN||SCN.out||!SCN.arr||performance.now()-SCN.arr<900)return;SCN.out=performance.now();SCN.Pe=C.position.clone();SCN.Le=scL.clone();document.body.classList.remove('scon')}
@@ -1125,6 +1133,99 @@ function scTick(){const n=performance.now(),S0=SCN;
  el2.addEventListener('pointerup',up);el2.addEventListener('pointercancel',up);
  document.addEventListener('keydown',e=>{if(SCN&&e.key==='Escape')scExit()});
  setTimeout(()=>{if(GQ!=='mobile')loadHero2()},6000)})();
+// ---------- hidden river statues: touch the glowing rock beside a river and a statue rises out of the water ----------
+// Two of them, point-mirrored through the middle of the map like everything else: a golden rock by the Baron river (statue 1) and by the Dragon river (statue 2).
+// Click / tap the rock. The statue surfaces, the camera circles it at waist height for 240 degrees, it sinks again and the camera returns to where you were.
+let EGG=null;
+const EGC={u:.8,h:2.6,R:3.1,fov:58,wy:.55,a:240},EGT={in:2.2,orb:8.6,sink:2.6,out:1.8,rise:2.6};
+const EGS=[{sg:1,file:'renebi'},{sg:-1,file:'jinx'}];
+const egS0=new THREE.CatmullRomCurve3([[-32,-32],[-27,-23.5],[-16.5,-12.5],[-6,-5.6]].map(p=>new V3(p[0],0,p[1])),false,'centripetal').getPointAt(EGC.u);
+EGS.forEach(d=>{d.pos=new V3(egS0.x*d.sg,0,egS0.z*d.sg);d.c=new V3();d.rip=[];d.spD=[];d.rock=null;d.W=null;d.P=null});
+const egCam=new THREE.PerspectiveCamera(),egP=new V3(),egL=new V3(),egQ=new THREE.Quaternion(),egRay=new THREE.Raycaster();let egTX=null;
+const egE=p=>.5-.5*Math.cos(Math.PI*p),egO=p=>1-Math.pow(1-p,3),egI=p=>p*p*(3-2*p);
+function egGlowTex(){if(egTX)return egTX;const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d'),g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.25,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,64,64);egTX=new THREE.CanvasTexture(c);egTX.userData={keep:1};return egTX}
+const egHide=(im,i)=>{im.setMatrixAt(i,new THREE.Matrix4().makeScale(0,0,0));im.instanceMatrix.needsUpdate=true};
+// statue 1's rock is the inner-row wall rock nearest its river spot, swapped for a shiny golden one; statue 2's rock is its exact point mirror
+function eggRocks(ia,ib){if(!ib||!MD.rock_b)return;const d0=EGS[0];let bi=-1,bd=1e9;
+ MIDP.rock.forEach((p,i)=>{if(i%2)return;const dd=Math.hypot(p[0]-d0.pos.x,p[1]-d0.pos.z);if(dd<bd){bd=dd;bi=i}});if(bi<0)return;
+ const m4=new THREE.Matrix4();ib.getMatrixAt(bi/2,m4);egHide(ib,bi/2);eggMake(d0,m4);
+ const pm=new V3(),q=new THREE.Quaternion(),sc=new V3();m4.decompose(pm,q,sc);
+ const mp=new V3(-pm.x,pm.y,-pm.z),mq=new THREE.Quaternion().setFromAxisAngle(UP,Math.PI).multiply(q);
+ let bj=-1,bn=1e9;MIDP.rock.forEach((p,i)=>{const dd=Math.hypot(p[0]-mp.x,p[1]-mp.z);if(dd<bn){bn=dd;bj=i}});
+ if(bn<1.9){if(bj%2){if(ia)egHide(ia,(bj-1)/2)}else egHide(ib,bj/2)}
+ eggMake(EGS[1],new THREE.Matrix4().compose(mp,mq,sc))}
+function eggMake(d,m4){const n='rock_b',
+  mat=new THREE.MeshStandardMaterial({map:MD[n].map,color:new THREE.Color(1.05,.9,.55),metalness:.55,roughness:.32,emissive:new THREE.Color(0xff9a1a),emissiveIntensity:.2}),
+  r=new THREE.Mesh(MD[n].g,mat);m4.decompose(r.position,r.quaternion,r.scale);r.updateMatrixWorld(true);S.add(r);
+ const bb=new THREE.Box3().setFromObject(r),c=bb.getCenter(new V3()),sz=bb.getSize(new V3()),gt=egGlowTex();
+ const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:gt,color:0xffbe45,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.5}));
+ halo.position.copy(c);halo.userData.s=Math.max(sz.x,sz.y,sz.z)*1.9;halo.scale.setScalar(halo.userData.s);S.add(halo);
+ const N=14,pa=new Float32Array(N*3),sp=new THREE.Points(new THREE.BufferGeometry(),new THREE.PointsMaterial({size:.38,map:gt,color:0xffe5a0,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.9}));
+ sp.geometry.setAttribute('position',new THREE.BufferAttribute(pa,3));sp.frustumCulled=false;S.add(sp);
+ for(let i=0;i<N;i++)d.spD.push([Math.random()*6.28,Math.random(),.5+Math.random()*.9,.25+Math.random()*.5]);
+ d.rock=r;d.c.copy(c);d.halo=halo;d.sp=sp;d.sz=Math.max(sz.x,sz.z)*.5;d.top=bb.max.y-bb.min.y}
+function eggFx(){const t=performance.now()/1000,e=.5+.5*Math.sin(t*2.2);
+ EGS.forEach(d=>{if(!d.rock)return;d.rock.material.emissiveIntensity=.1+.28*e;d.halo.material.opacity=(.28+.3*e)*Math.min(1,Math.max(.12,C.position.distanceTo(d.c)/16));d.halo.scale.setScalar(d.halo.userData.s*(.9+.2*e));
+  if(GQ==='mobile'){d.sp.visible=false;return}const pa=d.sp.geometry.attributes.position;
+  for(let i=0;i<d.spD.length;i++){const q=d.spD[i],k=(t*q[3]*.35+q[1])%1,a=q[0]+t*q[2]*.6,rr=d.sz*(.5+.7*k);pa.setXYZ(i,d.c.x+Math.cos(a)*rr,d.c.y-d.top*.3+k*d.top*1.7,d.c.z+Math.sin(a)*rr)}
+  pa.needsUpdate=true})}
+function loadEgg(d){if(d.P)return d.P;d.P=new Promise(res=>GL.load('assets/'+d.file+'.glb',gl=>{
+  const g=gl.scene,b=new THREE.Box3().setFromObject(g),sz=b.getSize(new V3()),ct=b.getCenter(new V3()),k=EGC.h/sz.y,W=new THREE.Group(),inner=new THREE.Group();
+  g.position.set(-ct.x,-b.min.y,-ct.z);
+  g.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.castShadow=true;o.receiveShadow=true;const m=o.material;m.metalness=Math.min(m.metalness==null?0:m.metalness,.3);['map','normalMap','metalnessMap','roughnessMap'].forEach(n=>{const t=m[n];if(t){t.anisotropy=8;t.userData={keep:1}}})}});
+  inner.add(g);inner.scale.setScalar(k);W.add(inner);W.visible=false;S.add(W);d.W=W;
+  const rm=()=>new THREE.MeshBasicMaterial({color:0xaee8ff,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
+  for(let i=0;i<6;i++){const r=new THREE.Mesh(new THREE.RingGeometry(.55,.7,64).rotateX(-Math.PI/2),rm());r.position.set(d.pos.x,.14,d.pos.z);r.visible=false;r.renderOrder=5;S.add(r);d.rip.push(r)}
+  const g2=new THREE.Sprite(new THREE.SpriteMaterial({map:egGlowTex(),color:0x8fe3ff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:0}));g2.position.set(d.pos.x,.9,d.pos.z);g2.scale.setScalar(6.5);g2.visible=false;S.add(g2);d.glow=g2;
+  res(W)},undefined,()=>res(null)));return d.P}
+// hit test: pointer ray against a rock (generous so it is easy to hit from far away on a phone). With the mouse captured in first person there is no cursor, so the view centre
+// aims with a wide cone instead; with a visible cursor or a finger the exact pointer position is used.
+function eggHit(d,nx,ny,fpp,locked){if(!d.rock)return -1;C.updateMatrixWorld();egRay.setFromCamera({x:nx,y:ny},C);const o=egRay.ray.origin,dist=o.distanceTo(d.c);
+ if(fpp&&dist>45)return -1;if(egRay.ray.direction.dot(egL.copy(d.c).sub(o))<=0)return -1;
+ return egRay.ray.distanceToPoint(d.c)<Math.max(1.6,dist*(locked?.26:.02))?dist:-1}
+function eggStart(d){if(EGG||TOUR||SCN||$('ld'))return;EGG={t0:0,sv:null,d};document.body.classList.add('eg','egw');
+ loadEgg(d).then(W=>{if(!EGG||EGG.t0)return;document.body.classList.remove('egw');if(!W){EGG=null;document.body.classList.remove('eg');return}
+  const E=EGG,sv={pos:C.position.clone(),q:C.quaternion.clone(),fov:C.fov,near:C.near,fpp:!!FPP,yaw:FPP?FPP.yaw:0,pitch:FPP?FPP.pitch:0};E.sv=sv;
+  const a0=Math.atan2(sv.pos.x-d.pos.x,sv.pos.z-d.pos.z),ar=Math.atan2(d.c.x-d.pos.x,d.c.z-d.pos.z),wr=a=>Math.abs(((a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI);
+  let best=1,bd=-1;[1,-1].forEach(sg=>{let m=9;for(let s=0;s<=EGC.a;s+=6)m=Math.min(m,wr(a0+sg*s*Math.PI/180-ar));if(m>bd){bd=m;best=sg}});
+  E.a0=a0;E.sgn=best;E.wy=.02+EGC.h*EGC.wy;E.sinkAt=EGT.in+EGT.orb;E.angEnd=a0+best*EGC.a*Math.PI/180;
+  W.rotation.y=a0;W.position.set(d.pos.x,-EGC.h-.2,d.pos.z);W.visible=false;d.glow.visible=true;d.rip.forEach(r=>r.visible=false);C.near=.1;E.t0=performance.now()})}
+function eggAng(E,t){const tb=E.sinkAt;if(t>=tb)return E.angEnd+E.sgn*(Math.PI/30)*egE(Math.min(1,(t-tb)/EGT.sink));
+ return E.a0+E.sgn*EGC.a*Math.PI/180*egE(Math.min(1,Math.max(0,(t-EGT.in)/EGT.orb)))}
+function eggSkip(){const E=EGG;if(!E||!E.t0)return;const t=(performance.now()-E.t0)/1000;if(t<3||t>=E.sinkAt)return;E.angEnd=eggAng(E,t);E.sinkAt=t}
+function eggFinish(restore){const E=EGG;if(!E)return;const d=E.d;if(d.W)d.W.visible=false;d.rip.forEach(r=>r.visible=false);if(d.glow)d.glow.visible=false;
+ if(restore&&E.sv){const sv=E.sv;C.position.copy(sv.pos);C.quaternion.copy(sv.q);C.fov=sv.fov;C.near=sv.near;C.updateProjectionMatrix();if(FPP){FPP.yaw=sv.yaw;FPP.pitch=sv.pitch;FPP.v.set(0,0,0);fppLast=performance.now()}}
+ document.body.classList.remove('eg','egw');EGG=null}
+function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now(),t=(now-E.t0)/1000,sv=E.sv,h=EGC.h;
+ if(sv.fpp&&!FPP){eggFinish(false);return}
+ const tc=E.sinkAt+EGT.sink,td=tc+EGT.out,W=d.W;
+ // statue: rises out of the river bed, later sinks back under it
+ let y=-(h+.2)+(h+.22)*egO(Math.min(1,Math.max(0,(t-.3)/EGT.rise)));
+ if(t>=E.sinkAt)y=.02-(h+.25)*egI(Math.min(1,(t-E.sinkAt)/EGT.sink));
+ W.position.y=y;W.visible=y>-h-.12;
+ // ripples on the water at the start of the rise and of the sink
+ const starts=[.3,.85,1.4,E.sinkAt,E.sinkAt+.55,E.sinkAt+1.1];
+ d.rip.forEach((r,i)=>{const lt=(t-starts[i])/2.3;if(lt<0||lt>1){r.visible=false;return}r.visible=true;r.scale.setScalar(1+lt*5.5);r.material.opacity=.42*Math.pow(1-lt,1.6)});
+ const gk=Math.min(1,Math.max(0,(t-.3)/EGT.rise))*(1-Math.min(1,Math.max(0,(t-E.sinkAt)/EGT.sink)));d.glow.material.opacity=.5*gk;
+ // camera: fly in, circle the statue at waist height, hold while it sinks, fly back
+ const az=eggAng(E,t);egP.set(d.pos.x+Math.sin(az)*EGC.R,E.wy,d.pos.z+Math.cos(az)*EGC.R);egL.set(d.pos.x,E.wy,d.pos.z);
+ egCam.position.copy(egP);egCam.lookAt(egL);egQ.copy(egCam.quaternion);
+ if(t<EGT.in){const k=scEase(t/EGT.in);C.position.lerpVectors(sv.pos,egP,k);C.quaternion.copy(sv.q).slerp(egQ,k);C.fov=sv.fov+(EGC.fov-sv.fov)*k}
+ else if(t<tc){C.position.copy(egP);C.quaternion.copy(egQ);C.fov=EGC.fov}
+ else{if(!E.op){E.op=C.position.clone();E.oq=C.quaternion.clone();E.of=C.fov}
+  const k=scEase(Math.min(1,(t-tc)/EGT.out));C.position.lerpVectors(E.op,sv.pos,k);C.quaternion.copy(E.oq).slerp(sv.q,k);C.fov=E.of+(sv.fov-E.of)*k}
+ C.updateProjectionMatrix();
+ if(t>=td)eggFinish(true)}
+(function(){const el2=R.domElement,pd=new Map();
+ el2.addEventListener('pointerdown',e=>{pd.set(e.pointerId,{x:e.clientX,y:e.clientY,t:performance.now(),multi:pd.size>0});if(pd.size>1)pd.forEach(v=>v.multi=true)});
+ const up=e=>{const p=pd.get(e.pointerId);pd.delete(e.pointerId);if(!p||p.multi||e.type==='pointercancel')return;
+  const lk=document.pointerLockElement===el2;if(!lk&&Math.hypot(e.clientX-p.x,e.clientY-p.y)>8)return;if(performance.now()-p.t>600)return;
+  if(EGG){eggSkip();return}if(TOUR||SCN||$('ld'))return;
+  const x=lk?VPW()/2:p.x,y=lk?VPH()/2:p.y;let bd=null,bs=1e9;
+  EGS.forEach(d=>{const s=eggHit(d,x/VPW()*2-1,-(y/VPH())*2+1,!!FPP,lk);if(s>=0&&s<bs){bs=s;bd=d}});if(bd)eggStart(bd)};
+ el2.addEventListener('pointerup',up);el2.addEventListener('pointercancel',up);
+ document.addEventListener('keydown',e=>{if(EGG&&e.key==='Escape')eggSkip()});
+ setTimeout(()=>{if(GQ!=='mobile')loadEgg(EGS[0])},9000);setTimeout(()=>{if(GQ!=='mobile')loadEgg(EGS[1])},18000)})();
 // ---------- full screen + landscape (button shows on small screens only; see #fsb in the CSS) ----------
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
 const FSI='<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',FXI='<svg viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>';
@@ -1143,7 +1244,7 @@ fsLabel();
  if(seen||!(VPW()<760||VPH()<520))return;mi.classList.add('on');
  const done=()=>{mi.classList.remove('on');try{sessionStorage.setItem('riftIntro','1')}catch(e){}};
  document.getElementById('mif').onclick=()=>{done();togFs()};document.getElementById('mic').onclick=done})();
-(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(VPW(),VPH())}}}
+(function loop(){if(GQF){const n=performance.now();if(n-GQT<1000/GQF-3){requestAnimationFrame(loop);return}GQT=n}tick();eggFx();if(EGG)eggTick();else if(TOUR)tourTick();else if(FPP)fppTick();else cam();SKY.position.copy(C.position);if(!R.shadowMap.autoUpdate&&++GQN%GFX[GQ].su===0)R.shadowMap.needsUpdate=true;R.render(S,C);if(GFX[GQ].ad){const n=performance.now();if(GQA.l){GQA.s+=n-GQA.l;GQA.c++}GQA.l=n;if(GQA.c>=90){const ms=GQA.s/GQA.c;GQA.s=GQA.c=0;let pr=GQA.pr;const tg=GQF?1000/GQF:16.7;if(ms>tg*1.4)pr=Math.max(GFX[GQ].mn||.75,pr-.25);else if(ms<tg*1.05)pr=Math.min(GFX[GQ].pr,pr+.25);if(pr!==GQA.pr){GQA.pr=pr;R.setPixelRatio(Math.min(devicePixelRatio,pr));R.setSize(VPW(),VPH())}}}
  labTick();
  if(TOUR)tourUI();requestAnimationFrame(loop)})();
 </script></body></html>
