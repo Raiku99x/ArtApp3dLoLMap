@@ -816,7 +816,7 @@ function pose(s,u){let pos,look;
  if(s.P){const e=sm3(u);pos=new V3(...s.P).lerp(new V3(...(s.P1||s.P)),e);look=new V3(...s.L).lerp(new V3(...(s.L1||s.L)),e)}
  else{const e=.5*u+.5*sm3(u);pos=sphP(s.t,s.r*(1+s.z*e),s.el+s.de*e,s.a+s.da*e);look=new V3(...s.t);
   const f=look.clone().sub(pos).normalize(),rt=new V3().crossVectors(f,UP).normalize(),up=new V3().crossVectors(rt,f).normalize(),off=s.r*.28;
-  if(NARROW())look.addScaledVector(up,-off*.8);else look.addScaledVector(rt,off)}
+  if(NARROW())look.addScaledVector(up,-off*.8);else look.addScaledVector(rt,off*.75)}
  pos.y=Math.max(pos.y,1.2);return{pos,look}}
 function setIcon(){$('vpl').innerHTML=TOUR&&TOUR.done?'&#8635;':TOUR&&TOUR.paused?'&#9654;':'&#10074;&#10074;'}
 function goTo(i){const T=TOUR,s=STS[i];T.ex=false;T.i=i;T.s=0;T.done=false;T.key='';T.from={pos:C.position.clone(),look:T.look.clone(),fov:C.fov};
