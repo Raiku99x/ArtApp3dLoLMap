@@ -860,7 +860,7 @@ function goTo(i){const T=TOUR,s=STS[i];T.ex=false;T.i=i;T.s=0;T.done=false;T.key
  $('vbox').classList.remove('on');$('vrt').classList.remove('on');$('vln').style.opacity=0;
  $('vbox').querySelector('.vk').textContent=T.focus?s.k:(i===STS.length-1?'LASTLY ':'')+String(i+1).padStart(2,'0')+'  \u00b7  '+s.k;$('vbox').querySelector('.vtt').textContent=s.h;
  [...$('vt').children].forEach((b,k)=>b.className=(k<i&&!T.focus)?'d':k===i?'a':'');setIcon()}
-function tourStart(){if(TOUR||FPP||$('ld'))return;STS=TD;$('vt').classList.remove('fm');$('vx').innerHTML='&#10005;';$('vx').title='Exit (Esc)';
+function tourStart(){if(TOUR||FPP||$('ld'))return;wakeTour(1);STS=TD;$('vt').classList.remove('fm');$('vx').innerHTML='&#10005;';$('vx').title='Exit (Esc)';
  // jungle wall close-up: lock onto a real wall cell near the intended spot
  if(WCELLS.length){let b=null,bd=1e9;WCELLS.forEach(c=>{const d=Math.hypot(c[0]+30,c[1]+8);if(d<bd){bd=d;b=c}});const s=TD.find(q=>q.wl);s.t=[b[0],1.2,b[1]];s.pt=[b[0],1.8,b[1]]}
  {const q=STP.statue_blue;if(q){const s=TD.find(w=>w.st);s.t=[q.x,q.y+5,q.z];s.pt=[q.x,q.y+4.4,q.z]}}
@@ -870,9 +870,9 @@ function tourStart(){if(TOUR||FPP||$('ld'))return;STS=TD;$('vt').classList.remov
  document.body.classList.add('tour');goTo(0);requestAnimationFrame(()=>requestAnimationFrame(()=>$('va').classList.add('on')))}
 function tourExit(){const T=TOUR;if(!T||T.ex)return;T.ex=true;T.s=0;T.paused=false;T.done=false;T.from={pos:C.position.clone(),look:T.look.clone(),fov:C.fov};
  {const q=T.sv2||{th:.6,ph:.9,rad:150};EXS.P=[q.rad*Math.sin(q.ph)*Math.sin(q.th),q.rad*Math.cos(q.ph),q.rad*Math.sin(q.ph)*Math.cos(q.th)]}$('va').classList.remove('on')}
-function tourFinish(){const T0=TOUR;TOUR=null;tsfxStop();STS=TD;$('vt').classList.remove('fm');FM=1;FXK=0;FX.visible=false;document.body.classList.remove('tour');$('va').classList.remove('on');
+function tourFinish(){const T0=TOUR;TOUR=null;wakeTour(0);tsfxStop();STS=TD;$('vt').classList.remove('fm');FM=1;FXK=0;FX.visible=false;document.body.classList.remove('tour');$('va').classList.remove('on');
  if(T0&&T0.sv2){th=T0.sv2.th;ph=T0.sv2.ph;rad=T0.sv2.rad}else{th=.6;ph=.9;rad=150}C.fov=50;C.updateProjectionMatrix();const sv=$('vbox');sv.classList.remove('on')}
-function tourTick(){const T=TOUR,now=performance.now(),dt=Math.min(.05,(now-T.last)/1000);T.last=now;
+function tourTick(){const T=TOUR,now=performance.now(),dt=Math.min(.05,(now-T.last)/1000);T.last=now;if(now-WKT>4000){WKT=now;wakeTour(1,1)}
  let st=T.ex?EXS:STS[T.i];if(!T.paused&&!T.done)T.s+=dt;
  if(T.s>=st.fl+st.dw){if(T.ex){const sv=T.sv;tourFinish();setClimate(sv.on?sv.mode:'clear');return}
   if(!T.focus&&T.i<STS.length-1){goTo(T.i+1);st=STS[T.i]}else{T.s=st.fl+st.dw;T.done=true;setIcon()}}
@@ -1282,6 +1282,18 @@ function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.cl
 (function(){const evs=['pointerdown','pointerup','click','keydown','touchend'],go=()=>{bgmPlay().then(()=>{if(!BGM.paused)evs.forEach(e=>removeEventListener(e,go,true))},()=>{})};
  evs.forEach(e=>addEventListener(e,go,true));go();
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)bgmPlay().catch(()=>{})})})();
+// ---------- keep the screen awake while the site is open (phones and desktop) ----------
+// Screen Wake Lock API: the screen does not dim or lock while the page is visible (covers the tour, FPP/TPP and the statue showcases). The browser drops the lock when the tab is hidden, so it is asked for again when the tab comes back and on the first tap/key. Browsers without the API (older iOS, some Firefox versions) just keep their normal sleep timer.
+let wlk=null;
+function wakeOn(){try{if(!('wakeLock' in navigator)||document.hidden||wlk)return;navigator.wakeLock.request('screen').then(l=>{wlk=l;l.addEventListener('release',()=>{if(wlk===l)wlk=null})}).catch(()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)wakeOn()});
+['pointerup','click','keydown','touchend'].forEach(e=>addEventListener(e,wakeOn,true));wakeOn();
+// Visual Analysis keep-awake: the wake lock is asked for again when the tour starts (a tap) and every 4 s while it runs. If the browser has no Screen Wake Lock (older iOS, plain http) or the lock was refused,
+// a 1 px invisible muted looping video plays instead (the classic NoSleep trick), which also stops the screen from sleeping. It stops when the tour ends.
+let WKV=null,WKT=0;
+function wkv(){if(WKV)return WKV;const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('muted','');v.setAttribute('aria-hidden','true');
+ v.style.cssText='position:fixed;left:0;top:0;width:1px;height:1px;opacity:.01;pointer-events:none;z-index:-1';v.src='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAOybW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAtx0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAACAAAAAgAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAQAAABAAAAAAJUbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAAUABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAAB/21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAb9zdGJsAAAAv3N0c2QAAAAAAAAAAQAAAK9hdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAACAAIABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAANWF2Y0MBZAAK/+EAGGdkAAqs2UlsBEAAAAMAQAAAAwKDxIllgAEABmjr48siwP34+AAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAANHAAADRwAAAAYc3R0cwAAAAAAAAABAAAACgAACAAAAAAUc3RzcwAAAAAAAAABAAAAAQAAAGBjdHRzAAAAAAAAAAoAAAABAAAQAAAAAAEAACgAAAAAAQAAEAAAAAABAAAAAAAAAAEAAAgAAAAAAQAAKAAAAAABAAAQAAAAAAEAAAAAAAAAAQAACAAAAAABAAAQAAAAABxzdHNjAAAAAAAAAAEAAAABAAAACgAAAAEAAAA8c3RzegAAAAAAAAAAAAAACgAAAsoAAAANAAAADAAAAAwAAAAMAAAAEwAAAA4AAAAMAAAADAAAABMAAAAUc3RjbwAAAAAAAAABAAAD4gAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjAuMTYuMTAwAAAACGZyZWUAAANPbWRhdAAAAq0GBf//qdxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjQgcjMxMDggMzFlMTlmOSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjMgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj01IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAFWWIhAAT//73sY+BTctIRZc4kgD/wQAAAAlBmiRsQS/+tcAAAAAIQZ5CeIIfNSEAAAAIAZ5hdEP/REAAAAAIAZ5jakP/REEAAAAPQZpoSahBaJlMCCH//quBAAAACkGehkURLBD/NSEAAAAIAZ6ldEP/REEAAAAIAZ6nakP/REAAAAAPQZqpSahBbJlMCH///quA';document.body.appendChild(v);return WKV=v}
+function wakeTour(on,tick){try{if(!on){if(WKV)WKV.pause();return}wakeOn();if(!('wakeLock' in navigator)||(tick&&!wlk))wkv().play().catch(()=>{});else if(wlk&&WKV&&!WKV.paused)WKV.pause()}catch(e){}}
 const SFX={mus:new Audio('assets/music.mp3'),mam:new Audio('assets/mamaaa.mp3')};SFX.mus.preload=SFX.mam.preload='auto';
 SFX.mus.loop=false;SFX.mus.addEventListener('ended',()=>{SFX.mus.loop=false;try{SFX.mus.pause()}catch(e){}});   // music.mp3 never repeats: when it ends it just stops
 let musT=0;   // time music.mp3 last started (guards against a second start)
