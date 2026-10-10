@@ -1264,16 +1264,17 @@ function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now()
  document.addEventListener('keydown',e=>{if(EGG&&e.key==='Escape')eggSkip()});
  setTimeout(()=>{if(GQ!=='mobile')loadEgg(EGS[0])},9000);setTimeout(()=>{if(GQ!=='mobile')loadEgg(EGS[1])},18000)})();
 // ---------- sound: Aurelion Sol background loop (menu toggle, on by default) + Renebi statue showcase sound effects ----------
-// Background: assets/aurelion_sol.mp3 loops forever, low and subtle (BG_BASE); 20% louder during Visual Analysis (BG_VA); ducked while the Renebi showcase plays.
+// Background: assets/aurelion_sol.mp3 loops forever, low and subtle (BG_BASE); 20% louder during Visual Analysis (BG_VA); silenced while the Renebi showcase plays (so it never doubles with music.mp3).
 // Browsers block sound until the first tap/click/key, so it starts on the first interaction. Note: iOS Safari ignores audio.volume (always full volume).
 // Renebi showcase only (Jinx has no sound): assets/music.mp3 as soon as the statue's head comes out of the water (8.5 s, original speed, plays once; the orbit timing is set so the statue is half under right as it ends), assets/mamaaa.mp3 when the statue is half under the river.
-const BG_BASE=.25,BG_VA=1.2,BG_DUCK=.2,SFX_VOL=.8;   // background 25%, 30% in Visual Analysis (x1.2), 5% during the Renebi showcase (x.2); Renebi sound effects 80%
+const BG_BASE=.25,BG_VA=1.2,BG_DUCK=0,SFX_VOL=.8;   // background 25%, 30% in Visual Analysis (x1.2), OFF during the Renebi showcase (x0, so music.mp3 is not doubled by the background loop); Renebi sound effects 80%
 const BGM=new Audio('assets/aurelion_sol.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;
 let musicOn=true,bgmV=0,bgmLast=performance.now();
 function bgmTarget(){if(!musicOn||document.hidden)return 0;let v=BG_BASE;if(TOUR&&!TOUR.focus)v*=BG_VA;if(EGG&&EGG.d.file==='renebi')v*=BG_DUCK;return v}
 let bgmGo=false,bgmRetry=0;BGM.addEventListener('playing',()=>{bgmGo=true});BGM.addEventListener('ended',()=>{try{BGM.currentTime=0}catch(e){}bgmPlay().catch(()=>{})});
 function bgmTick(){const n=performance.now(),dt=Math.min(.1,(n-bgmLast)/1000);bgmLast=n;const tg=bgmTarget();
- if(tg>0&&bgmGo&&BGM.paused&&n-bgmRetry>1500){bgmRetry=n;bgmPlay().catch(()=>{})}   // watchdog: if the browser paused the loop (another sound started, tab came back...) start it againbgmV+=(tg-bgmV)*Math.min(1,dt*3);
+ if(tg>0&&bgmGo&&BGM.paused&&n-bgmRetry>1500){bgmRetry=n;bgmPlay().catch(()=>{})}   // watchdog: if the browser paused the loop (another sound started, tab came back...) start it again
+ bgmV+=(tg-bgmV)*Math.min(1,dt*3);
  try{BGM.volume=Math.min(1,Math.max(0,bgmV))}catch(e){}if(tg===0&&bgmV<.002&&!BGM.paused)BGM.pause()}
 function bgmPlay(){if(!musicOn||!BGM.paused)return Promise.resolve();try{const p=BGM.play();return p&&p.then?p.catch(()=>{throw 0}):Promise.resolve()}catch(e){return Promise.reject()}}
 function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.classList.toggle('on',musicOn);b.textContent='Music: '+(musicOn?'On':'Off');if(musicOn)bgmPlay().catch(()=>{})}
@@ -1281,8 +1282,11 @@ function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.cl
  evs.forEach(e=>addEventListener(e,go,true));go();
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)bgmPlay().catch(()=>{})})})();
 const SFX={mus:new Audio('assets/music.mp3'),mam:new Audio('assets/mamaaa.mp3')};SFX.mus.preload=SFX.mam.preload='auto';
-function egSfxPlay(a){try{a.currentTime=0;a.volume=SFX_VOL;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
-function egSfxStop(){SFX.mus.loop=false;[SFX.mus,SFX.mam].forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}})}
+SFX.mus.loop=false;SFX.mus.addEventListener('ended',()=>{SFX.mus.loop=false;try{SFX.mus.pause()}catch(e){}});   // music.mp3 never repeats: when it ends it just stops
+let musT=0;   // time music.mp3 last started (guards against a second start)
+function egSfxPlay(a){try{if(a===SFX.mus){const n=performance.now();if(!a.paused||n-musT<15000)return;musT=n}   // music.mp3: never start it again while it is playing or within 15 s of its last start (one play per showcase)
+ a.loop=false;a.currentTime=0;a.volume=SFX_VOL;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function egSfxStop(){musT=0;SFX.mus.loop=false;[SFX.mus,SFX.mam].forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}})}
 function egSfx(E,t,y,h){
  if(!E.mus&&t<E.sinkAt&&y+h>=.1){E.mus=1;SFX.mus.loop=false;egSfxPlay(SFX.mus)}                // the statue's head breaks the water: music starts and plays through once (no restart)
  if(!E.mam&&t>=E.sinkAt&&y<=-h*.5){E.mam=1;sfxFade(SFX.mus,90);egSfxPlay(SFX.mam)}}   // statue is half under the water: music stops, mamaaa plays right away
