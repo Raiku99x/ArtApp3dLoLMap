@@ -168,6 +168,7 @@ body.eg #egx{opacity:0!important}
 /* first-open hand hint on the Visual Analysis button + label tip toast */
 #ui .va{position:relative}
 #vhand{position:absolute;left:100%;top:50%;margin-left:6px;font-size:26px;line-height:1;letter-spacing:0;text-transform:none;pointer-events:none;opacity:0;visibility:hidden;transform:translateY(-50%);filter:drop-shadow(0 2px 4px #000c);transition:opacity .5s,visibility .5s;white-space:nowrap}
+#vhand svg{display:block;width:32px;height:32px}
 #vhand.show{opacity:1;visibility:visible;animation:vhnudge 1s ease-in-out infinite}
 @keyframes vhnudge{0%,100%{transform:translate(0,-50%)}50%{transform:translate(-9px,-50%)}}
 #ui .va.hint{animation:vhglow 1.4s ease-in-out infinite}
@@ -175,8 +176,20 @@ body.eg #egx{opacity:0!important}
 #lbtip{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:31;max-width:86vw;transform:translate(-50%,12px);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s;padding:9px 16px;text-align:center;font:700 12.5px/1.4 'Cinzel','Beaufort for LOL',Georgia,serif;letter-spacing:.06em;color:#f0e6d2;background:linear-gradient(180deg,#0a1e2df2,#010a13f5);border:1px solid #c8aa6e;box-shadow:inset 0 0 0 1px #010a13,0 4px 14px #000a,0 0 12px #c8aa6e55}
 #lbtip.on{opacity:1;transform:translate(-50%,0)}
 body.tour #lbtip,body.eg #lbtip{display:none}
+#itip{position:fixed;left:50%;top:50%;z-index:32;width:min(320px,86vw);box-sizing:border-box;transform:translate(-50%,-46%) scale(.96);opacity:0;visibility:hidden;pointer-events:none;padding:14px 18px 16px;text-align:left;color:#cdbe91;background:linear-gradient(180deg,#0a1e2df2,#010a13f5);border:1px solid #c8aa6e;box-shadow:inset 0 0 0 1px #010a13,0 8px 28px #000c,0 0 18px #c8aa6e44;font-family:'Cinzel','Beaufort for LOL',Georgia,serif;transition:opacity .45s,transform .45s,visibility .45s;overflow:hidden}
+#itip.on{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+#itip .it{font-weight:700;font-size:13px;letter-spacing:.3em;color:#f0e6d2;text-align:center;margin-bottom:10px;text-shadow:0 0 10px #c8aa6e88}
+#itip .ir{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:12px;letter-spacing:.05em;line-height:1.35;border-top:1px solid #46371466}
+#itip .ic{flex:0 0 30px;display:flex;align-items:center;justify-content:center}
+#itip .ic svg{display:block;width:26px;height:26px;fill:none;stroke:#c8aa6e;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#itip b{color:#f0e6d2;letter-spacing:.1em;text-transform:uppercase}
+#itip .if{margin-top:8px;text-align:center;font-size:10.5px;letter-spacing:.14em;color:#c8aa6e;text-transform:uppercase;opacity:.85}
+#itip .ib{position:absolute;left:0;bottom:0;height:3px;width:100%;background:linear-gradient(90deg,#785a28,#f0e6d2);transform-origin:0 50%;transform:scaleX(1)}
+#itip.on .ib{animation:itbar 7s linear forwards}
+@keyframes itbar{to{transform:scaleX(0)}}
+body.tour #itip,body.eg #itip,body.fpp #itip{display:none}
 </style><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet"></head><body>
-<div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="vaHintOff();tourStart()">&#9654; Visual Analysis<span id="vhand">&#128072;</span></button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
+<div id="ui"><button id="ut" onclick="togMenu()">&#9776; Menu</button><button class="va" onclick="vaHintOff();tourStart()">&#9654; Visual Analysis<span id="vhand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="10.5" width="17" height="5.2" rx="2.6" fill="#f0e6d2" stroke="#785a28" stroke-width="1.4"/><rect x="14" y="9" width="15" height="16" rx="5" fill="#f0e6d2" stroke="#785a28" stroke-width="1.4"/><path d="M16.5 19h9M16.5 22h8" stroke="#785a28" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg></span></button><div id="um"><b>3D Map</b><br>Drag = rotate · Scroll/pinch = zoom<br>
 <button data-v="top" onclick="top_()">Top view</button><button data-v="tilt" onclick="tilt()">Angled view</button><button data-v="sky" onclick="skyv()">Sky view</button><button id="lbb" onclick="lab=!lab;sync();labTip()">Labels</button><br><button class="fp" onclick="fppStart()">FPP</button><button class="fp" onclick="tppStart()">TPP</button><button id="cb" onclick="togClimate()">Climate &#9656;</button><span id="cl"><button data-c="spooky" class="on" onclick="pickClimate('spooky')">Smog</button><button data-c="clear" onclick="pickClimate('clear')">Clear</button></span><button id="gb" onclick="togGfx()">Graphics &#9656;</button><span id="gx"><button data-g="high" class="on" onclick="pickGfx('high')">High</button><button data-g="optimized" onclick="pickGfx('optimized')">Optimized</button><button data-g="mobile" onclick="pickGfx('mobile')">Mobile</button></span><button id="mub" class="on" onclick="togMusic()">Music: On</button></div></div>
 <div id="va"><div class="vg"></div><div class="lb t"></div><div id="vh"><i></i>REC &middot; DRONE CAM<span id="valt"></span></div><div id="vhint"></div>
 <div class="lb b"><div id="vc"><button id="vpv" title="Previous (&larr;)">&#9198;</button><button id="vpl" title="Pause / play (space)">&#10074;&#10074;</button><button id="vnx" title="Next (&rarr;)">&#9197;</button><div id="vt"></div><button id="vx" title="Close (Esc)">&#10005;</button></div></div>
@@ -186,7 +199,7 @@ body.tour #lbtip,body.eg #lbtip{display:none}
 <button id="fsb" onclick="togFs()" title="Full screen and landscape" aria-label="Full screen and landscape"></button>
 <div id="mi" role="dialog" aria-modal="true" aria-labelledby="mit"><div class="mc"><h2 id="mit">Viewing on a phone?</h2><p>The map looks best <b>full screen in landscape</b>. Tap the button below and the map switches to full screen landscape.</p><p class="mn">On mobile the map is drawn at a lower resolution (Optimized graphics) so it runs smoothly. You can change this any time in <b>Menu &#9656; Graphics</b>.</p><div class="mb"><button id="mif">Full screen &amp; landscape</button><button id="mic" class="g">Continue as is</button></div></div></div>
 <div id="cre"><b>CREATOR</b><i>tap to go back</i></div>
-<div id="lbtip"></div><div id="egl"><i></i><i></i></div><div id="egx"></div><div id="egt">SOMETHING STIRS&hellip;</div><div id="ld">Loading models…</div>
+<div id="lbtip"></div><div id="itip"></div><div id="egl"><i></i><i></i></div><div id="egx"></div><div id="egt">SOMETHING STIRS&hellip;</div><div id="ld">Loading models…</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script>
@@ -1253,12 +1266,14 @@ function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now()
 // ---------- sound: Aurelion Sol background loop (menu toggle, on by default) + Renebi statue showcase sound effects ----------
 // Background: assets/aurelion_sol.mp3 loops forever, low and subtle (BG_BASE); 20% louder during Visual Analysis (BG_VA); ducked while the Renebi showcase plays.
 // Browsers block sound until the first tap/click/key, so it starts on the first interaction. Note: iOS Safari ignores audio.volume (always full volume).
-// Renebi showcase only (Jinx has no sound): assets/music.mp3 as soon as the statue's head comes out of the water, assets/mamaaa.mp3 when the statue is half under the river.
+// Renebi showcase only (Jinx has no sound): assets/music.mp3 as soon as the statue's head comes out of the water (it loops until the statue is half under), assets/mamaaa.mp3 when the statue is half under the river.
 const BG_BASE=.25,BG_VA=1.2,BG_DUCK=.2,SFX_VOL=.8;   // background 25%, 30% in Visual Analysis (x1.2), 5% during the Renebi showcase (x.2); Renebi sound effects 80%
 const BGM=new Audio('assets/aurelion_sol.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;
 let musicOn=true,bgmV=0,bgmLast=performance.now();
 function bgmTarget(){if(!musicOn||document.hidden)return 0;let v=BG_BASE;if(TOUR&&!TOUR.focus)v*=BG_VA;if(EGG&&EGG.d.file==='renebi')v*=BG_DUCK;return v}
-function bgmTick(){const n=performance.now(),dt=Math.min(.1,(n-bgmLast)/1000);bgmLast=n;const tg=bgmTarget();bgmV+=(tg-bgmV)*Math.min(1,dt*3);
+let bgmGo=false,bgmRetry=0;BGM.addEventListener('playing',()=>{bgmGo=true});BGM.addEventListener('ended',()=>{try{BGM.currentTime=0}catch(e){}bgmPlay().catch(()=>{})});
+function bgmTick(){const n=performance.now(),dt=Math.min(.1,(n-bgmLast)/1000);bgmLast=n;const tg=bgmTarget();
+ if(tg>0&&bgmGo&&BGM.paused&&n-bgmRetry>1500){bgmRetry=n;bgmPlay().catch(()=>{})}   // watchdog: if the browser paused the loop (another sound started, tab came back...) start it againbgmV+=(tg-bgmV)*Math.min(1,dt*3);
  try{BGM.volume=Math.min(1,Math.max(0,bgmV))}catch(e){}if(tg===0&&bgmV<.002&&!BGM.paused)BGM.pause()}
 function bgmPlay(){if(!musicOn||!BGM.paused)return Promise.resolve();try{const p=BGM.play();return p&&p.then?p.catch(()=>{throw 0}):Promise.resolve()}catch(e){return Promise.reject()}}
 function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.classList.toggle('on',musicOn);b.textContent='Music: '+(musicOn?'On':'Off');if(musicOn)bgmPlay().catch(()=>{})}
@@ -1267,11 +1282,10 @@ function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.cl
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)bgmPlay().catch(()=>{})})})();
 const SFX={mus:new Audio('assets/music.mp3'),mam:new Audio('assets/mamaaa.mp3')};SFX.mus.preload=SFX.mam.preload='auto';
 function egSfxPlay(a){try{a.currentTime=0;a.volume=SFX_VOL;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
-function egSfxStop(){[SFX.mus,SFX.mam].forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}})}
+function egSfxStop(){SFX.mus.loop=false;[SFX.mus,SFX.mam].forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}})}
 function egSfx(E,t,y,h){
- if(!E.mus&&t<E.sinkAt&&y+h>=.1){E.mus=1;egSfxPlay(SFX.mus)}                            // the statue's head breaks the water surface
- if(E.mus&&t>=E.sinkAt&&!SFX.mus.paused){const f=1-(t-E.sinkAt)/.5;if(f<=0)SFX.mus.pause();else SFX.mus.volume=f*SFX_VOL}  // cut if skipped to the sink
- if(!E.mam&&t>=E.sinkAt&&y<=-h*.5){E.mam=1;egSfxPlay(SFX.mam)}}                         // statue is half under the water
+ if(!E.mus&&t<E.sinkAt&&y+h>=.1){E.mus=1;SFX.mus.loop=true;egSfxPlay(SFX.mus)}                 // the statue's head breaks the water: music starts and keeps looping
+ if(!E.mam&&t>=E.sinkAt&&y<=-h*.5){E.mam=1;SFX.mus.loop=false;sfxFade(SFX.mus,90);egSfxPlay(SFX.mam)}}   // statue is half under the water: music stops, mamaaa plays right away
 // ---------- Visual Analysis sounds (assets/tour/) ----------
 // keyboard.mp3: starts when a step's text box appears and fades out when the typing ends. when_pointing_element.mp3: plays when the pointer ring + line appear on the element.
 // Both stop (short fade) when the box goes away, the step changes, or you exit; the pause button pauses them. A missing file is silent. Not used by the label close-ups.
@@ -1287,12 +1301,31 @@ function tsfxTick(T,vis,n,len,show){
  const ps=[TSX.a,TSX.p].filter(Boolean);
  if(T.paused&&!TSX.hold){TSX.hold=1;ps.forEach(a=>a.pause())}
  else if(!T.paused&&TSX.hold){TSX.hold=0;ps.forEach(a=>{try{const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}})}}
-// ---------- first-open hint: a hand points at the Visual Analysis button 5 s after the map has loaded and stays until it is pressed (every time the site is opened) ----------
+// ---------- first-open hint: a hand points at the Visual Analysis button 3 s after the map has loaded, for 9 s or until it is pressed (every time the site is opened) ----------
 // ---------- label tip: turning Labels on shows "click a label to zoom in" until the person has clicked a label once ----------
-const VH={t0:0,off:false,iv:0};
+const VH={t0:0,off:false,iv:0},VH_DELAY=3000,VH_MS=9000;   // the hand shows VH_DELAY (3 s) after loading and goes away after VH_MS (9 s) or as soon as Visual Analysis is pressed
 function vaHintOff(){VH.off=true;clearInterval(VH.iv);const h=document.getElementById('vhand'),b=document.querySelector('#ui .va');if(h)h.classList.remove('show');if(b)b.classList.remove('hint')}
 VH.iv=setInterval(()=>{if(VH.off)return;if(document.getElementById('ld')){VH.t0=0;return}if(!VH.t0)VH.t0=performance.now();
- if(performance.now()-VH.t0<5000||TOUR||FPP||EGG||SCN)return;clearInterval(VH.iv);document.getElementById('vhand').classList.add('show');document.querySelector('#ui .va').classList.add('hint')},400);
+ if(performance.now()-VH.t0<VH_DELAY||TOUR||FPP||EGG||SCN)return;clearInterval(VH.iv);document.getElementById('vhand').classList.add('show');document.querySelector('#ui .va').classList.add('hint');setTimeout(vaHintOff,VH_MS)},400);
+// ---------- how-to-explore tip: shown in the middle of the screen every time the site is opened (phone: swipe / pinch, desktop: mouse), 7 s or until the person swipes, scrolls or presses a key ----------
+const IT_I={
+ swipe:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3.5 12H7M17 12h3.5M6 9.5L3.5 12 6 14.5M18 9.5l2.5 2.5-2.5 2.5"/></svg>',
+ pinch:'<svg viewBox="0 0 24 24"><path d="M20 4l-5 5M15 5.5V9h3.5M4 20l5-5M9 18.5V15H5.5"/></svg>',
+ menu:'<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+ drag:'<svg viewBox="0 0 24 24"><rect x="6.5" y="3" width="11" height="18" rx="5.5"/><path d="M12 3v7M6.5 10h11"/><path d="M12 3v7H6.5V8.5A5.5 5.5 0 0 1 12 3z" fill="#c8aa6e"/></svg>',
+ scroll:'<svg viewBox="0 0 24 24"><rect x="3.5" y="3" width="10" height="18" rx="5"/><path d="M8.5 7v4M17 9.5l3-3 3 3M17 14.5l3 3 3-3"/></svg>'};
+const IT={on:false,t:0,iv:0},IT_MS=7000,itP=new Map();
+function itipOff(){if(!IT.on)return;IT.on=false;clearTimeout(IT.t);document.getElementById('itip').classList.remove('on')}
+IT.iv=setInterval(()=>{const mi=document.getElementById('mi');if(document.getElementById('ld')||(mi&&mi.classList.contains('on'))||TOUR||FPP||EGG||SCN)return;clearInterval(IT.iv);
+ const e=document.getElementById('itip'),r=(i,h)=>'<div class="ir"><span class="ic">'+i+'</span><span>'+h+'</span></div>';
+ e.innerHTML='<div class="it">EXPLORE THE MAP</div>'+(isTouch?
+  r(IT_I.swipe,'<b>Swipe</b> &middot; rotate and tilt')+r(IT_I.pinch,'<b>Pinch</b> &middot; zoom in and out')+r(IT_I.menu,'<b>Menu</b> &middot; Visual Analysis, Labels, FPP')+'<div class="if">Swipe to start exploring</div>':
+  r(IT_I.drag,'<b>Drag</b> &middot; rotate and tilt')+r(IT_I.scroll,'<b>Scroll</b> &middot; zoom in and out')+r(IT_I.menu,'<b>Menu</b> (top left) &middot; Visual Analysis, Labels, FPP / TPP')+'<div class="if">Drag, scroll or press any key</div>')+'<i class="ib"></i>';
+ setTimeout(()=>{if(document.body.classList.contains('tour')||FPP||EGG)return;IT.on=true;e.classList.add('on');IT.t=setTimeout(itipOff,IT_MS)},500)},300);
+addEventListener('pointerdown',e=>itP.set(e.pointerId,[e.clientX,e.clientY]),true);
+addEventListener('pointermove',e=>{if(!IT.on)return;const o=itP.get(e.pointerId);if(o&&Math.hypot(e.clientX-o[0],e.clientY-o[1])>8)itipOff()},true);
+['pointerup','pointercancel'].forEach(n=>addEventListener(n,e=>itP.delete(e.pointerId),true));
+addEventListener('wheel',itipOff,{passive:true,capture:true});addEventListener('keydown',itipOff,true);
 let lbTipDone=false,lbTipT=0;
 function labTip(){const e=document.getElementById('lbtip');clearTimeout(lbTipT);if(!lab||lbTipDone){e.classList.remove('on');return}
  e.textContent='Tip: '+(isTouch?'tap':'click')+' a label to zoom in';e.classList.add('on');lbTipT=setTimeout(()=>e.classList.remove('on'),5500)}
