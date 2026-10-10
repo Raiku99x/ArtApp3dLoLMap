@@ -1166,7 +1166,7 @@ function scTick(){const n=performance.now(),S0=SCN;
 // Two of them, point-mirrored through the middle of the map like everything else: a golden rock by the Baron river (statue 1) and by the Dragon river (statue 2).
 // Click / tap the rock. The statue surfaces, the camera circles it at waist height for 180 degrees, swings 60 degrees back toward where it started (a small bounce), then the statue sinks again and the camera returns to where you were.
 let EGG=null;
-const EGC={u:.8,h:2.6,R:3.1,fov:58,wy:.55,a:180,back:60},EGT={in:2.2,rip:2.3,riseAt:3.3,orbAt:4.9,orb:8.6,fwd:6,sink:3.4,out:1.8,rise:2.6};   // orbit: a degrees forward in fwd seconds, then back degrees return in the rest of orb
+const EGC={u:.8,h:2.6,R:3.1,fov:58,wy:.55,a:180,back:60},EGT={in:2.2,rip:2.3,riseAt:3.3,orbAt:4.3,orb:6,fwd:4.2,sink:3.4,out:1.8,rise:2.6};   // orbit: a degrees forward in fwd seconds, then back degrees return in the rest of orb
 const EGS=[{sg:1,file:'renebi'},{sg:-1,file:'jinx'}];
 const egS0=new THREE.CatmullRomCurve3([[-32,-32],[-27,-23.5],[-16.5,-12.5],[-6,-5.6]].map(p=>new V3(p[0],0,p[1])),false,'centripetal').getPointAt(EGC.u);
 EGS.forEach(d=>{d.pos=new V3(egS0.x*d.sg,0,egS0.z*d.sg);d.c=new V3();d.rip=[];d.spD=[];d.rock=null;d.W=null;d.P=null});
@@ -1266,7 +1266,7 @@ function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now()
 // ---------- sound: Aurelion Sol background loop (menu toggle, on by default) + Renebi statue showcase sound effects ----------
 // Background: assets/aurelion_sol.mp3 loops forever, low and subtle (BG_BASE); 20% louder during Visual Analysis (BG_VA); ducked while the Renebi showcase plays.
 // Browsers block sound until the first tap/click/key, so it starts on the first interaction. Note: iOS Safari ignores audio.volume (always full volume).
-// Renebi showcase only (Jinx has no sound): assets/music.mp3 as soon as the statue's head comes out of the water (it loops until the statue is half under), assets/mamaaa.mp3 when the statue is half under the river.
+// Renebi showcase only (Jinx has no sound): assets/music.mp3 as soon as the statue's head comes out of the water (8.5 s, original speed, plays once; the orbit timing is set so the statue is half under right as it ends), assets/mamaaa.mp3 when the statue is half under the river.
 const BG_BASE=.25,BG_VA=1.2,BG_DUCK=.2,SFX_VOL=.8;   // background 25%, 30% in Visual Analysis (x1.2), 5% during the Renebi showcase (x.2); Renebi sound effects 80%
 const BGM=new Audio('assets/aurelion_sol.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;
 let musicOn=true,bgmV=0,bgmLast=performance.now();
@@ -1284,8 +1284,8 @@ const SFX={mus:new Audio('assets/music.mp3'),mam:new Audio('assets/mamaaa.mp3')}
 function egSfxPlay(a){try{a.currentTime=0;a.volume=SFX_VOL;const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
 function egSfxStop(){SFX.mus.loop=false;[SFX.mus,SFX.mam].forEach(a=>{try{a.pause();a.currentTime=0}catch(e){}})}
 function egSfx(E,t,y,h){
- if(!E.mus&&t<E.sinkAt&&y+h>=.1){E.mus=1;SFX.mus.loop=true;egSfxPlay(SFX.mus)}                 // the statue's head breaks the water: music starts and keeps looping
- if(!E.mam&&t>=E.sinkAt&&y<=-h*.5){E.mam=1;SFX.mus.loop=false;sfxFade(SFX.mus,90);egSfxPlay(SFX.mam)}}   // statue is half under the water: music stops, mamaaa plays right away
+ if(!E.mus&&t<E.sinkAt&&y+h>=.1){E.mus=1;SFX.mus.loop=false;egSfxPlay(SFX.mus)}                // the statue's head breaks the water: music starts and plays through once (no restart)
+ if(!E.mam&&t>=E.sinkAt&&y<=-h*.5){E.mam=1;sfxFade(SFX.mus,90);egSfxPlay(SFX.mam)}}   // statue is half under the water: music stops, mamaaa plays right away
 // ---------- Visual Analysis sounds (assets/tour/) ----------
 // keyboard.mp3: starts when a step's text box appears and fades out when the typing ends. when_pointing_element.mp3: plays when the pointer ring + line appear on the element.
 // Both stop (short fade) when the box goes away, the step changes, or you exit; the pause button pauses them. A missing file is silent. Not used by the label close-ups.
