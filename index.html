@@ -1267,7 +1267,7 @@ function eggTick(){const E=EGG;if(!E.t0)return;const d=E.d,now=performance.now()
 // Background: assets/aurelion_sol.mp3 loops forever, low and subtle (BG_BASE); 20% louder during Visual Analysis (BG_VA); silenced while the Renebi showcase plays (so it never doubles with music.mp3).
 // Browsers block sound until the first tap/click/key, so it starts on the first interaction. Note: iOS Safari ignores audio.volume (always full volume).
 // Renebi showcase only (Jinx has no sound): assets/music.mp3 as soon as the statue's head comes out of the water (8.5 s, original speed, plays once; the orbit timing is set so the statue is half under right as it ends), assets/mamaaa.mp3 when the statue is half under the river.
-const BG_BASE=.25,BG_VA=1.2,BG_DUCK=0,SFX_VOL=.8;   // background 25%, 30% in Visual Analysis (x1.2), OFF during the Renebi showcase (x0, so music.mp3 is not doubled by the background loop); Renebi sound effects 80%
+const BG_BASE=.7,BG_VA=.6/.7,BG_DUCK=0,SFX_VOL=.8;   // background 70%, 60% in Visual Analysis (x.6/.7), OFF during the Renebi showcase (x0, so music.mp3 is not doubled by the background loop); Renebi sound effects 80%
 const BGM=new Audio('assets/aurelion_sol.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;
 let musicOn=true,bgmV=0,bgmLast=performance.now();
 function bgmTarget(){if(!musicOn||document.hidden)return 0;let v=BG_BASE;if(TOUR&&!TOUR.focus)v*=BG_VA;if(EGG&&EGG.d.file==='renebi')v*=BG_DUCK;return v}
@@ -1278,7 +1278,8 @@ function bgmTick(){const n=performance.now(),dt=Math.min(.1,(n-bgmLast)/1000);bg
  try{BGM.volume=Math.min(1,Math.max(0,bgmV))}catch(e){}if(tg===0&&bgmV<.002&&!BGM.paused)BGM.pause()}
 function bgmPlay(){if(!musicOn||!BGM.paused)return Promise.resolve();try{const p=BGM.play();return p&&p.then?p.catch(()=>{throw 0}):Promise.resolve()}catch(e){return Promise.reject()}}
 function togMusic(){musicOn=!musicOn;const b=document.getElementById('mub');b.classList.toggle('on',musicOn);b.textContent='Music: '+(musicOn?'On':'Off');if(musicOn)bgmPlay().catch(()=>{})}
-(function(){const evs=['pointerdown','keydown','touchend'],go=()=>{bgmPlay().then(()=>{if(!BGM.paused)evs.forEach(e=>removeEventListener(e,go,true))},()=>{})};
+// phones only accept a finished tap (pointerup / touchend / click) as permission to play sound; a swipe or drag never counts, so keep listening until one tap succeeds
+(function(){const evs=['pointerdown','pointerup','click','keydown','touchend'],go=()=>{bgmPlay().then(()=>{if(!BGM.paused)evs.forEach(e=>removeEventListener(e,go,true))},()=>{})};
  evs.forEach(e=>addEventListener(e,go,true));go();
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)bgmPlay().catch(()=>{})})})();
 const SFX={mus:new Audio('assets/music.mp3'),mam:new Audio('assets/mamaaa.mp3')};SFX.mus.preload=SFX.mam.preload='auto';
@@ -1293,7 +1294,7 @@ function egSfx(E,t,y,h){
 // ---------- Visual Analysis sounds (assets/tour/) ----------
 // keyboard.mp3: starts when a step's text box appears and fades out when the typing ends. when_pointing_element.mp3: plays when the pointer ring + line appear on the element.
 // Both stop (short fade) when the box goes away, the step changes, or you exit; the pause button pauses them. A missing file is silent. Not used by the label close-ups.
-const TXT_VOL=.6,PT_VOL=.8,TSX={a:null,p:null,hold:0,tf:0,miss:{}};
+const TXT_VOL=.9,PT_VOL=.8,TSX={a:null,p:null,hold:0,tf:0,miss:{}};
 function sfxFade(a,ms){if(!a)return;const v0=a.volume,t0=performance.now();(function f(){const k=(performance.now()-t0)/ms;if(k>=1||a.paused){try{a.pause()}catch(e){}return}try{a.volume=Math.max(0,v0*(1-k))}catch(e){}setTimeout(f,30)})()}
 function tsfxStop(){sfxFade(TSX.a,250);sfxFade(TSX.p,250);TSX.a=TSX.p=null;TSX.hold=0;TSX.tf=0}
 function tsfxPlay(f,v,k){if(TSX.miss[k])return null;const a=new Audio(f);a.volume=v;a.addEventListener('error',()=>{TSX.miss[k]=1});try{const p=a.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}return a}
